@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.Contracts", "Novademy.Contracts\Novademy.Contracts.csproj", "{A763AF9F-DA0F-4C21-AFCE-9AAB2FB6D89D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.Application", "Novademy.Application\Novademy.Application.csproj", "{06FE44C4-7D1C-4811-8E0E-91314B165D6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.API", "Novademy.API\Novademy.API.csproj", "{283D109A-A531-48DF-AA27-52B264A785C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A763AF9F-DA0F-4C21-AFCE-9AAB2FB6D89D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A763AF9F-DA0F-4C21-AFCE-9AAB2FB6D89D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A763AF9F-DA0F-4C21-AFCE-9AAB2FB6D89D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A763AF9F-DA0F-4C21-AFCE-9AAB2FB6D89D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06FE44C4-7D1C-4811-8E0E-91314B165D6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06FE44C4-7D1C-4811-8E0E-91314B165D6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06FE44C4-7D1C-4811-8E0E-91314B165D6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06FE44C4-7D1C-4811-8E0E-91314B165D6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{283D109A-A531-48DF-AA27-52B264A785C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{283D109A-A531-48DF-AA27-52B264A785C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{283D109A-A531-48DF-AA27-52B264A785C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{283D109A-A531-48DF-AA27-52B264A785C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

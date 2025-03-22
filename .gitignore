@@ -1,0 +1,47 @@
+# ====================
+# macOS System Files
+# ====================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# ====================
+# Rider IDE Files
+# ====================
+.idea/
+*.sln.iml
+
+# ====================
+# Build and Output Directories
+# ====================
+bin/
+obj/
+publish/
+
+# ====================
+# User-Specific Files
+# ====================
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# ====================
+# ReSharper and Other Temporary Files
+# ====================
+_ReSharper*/
+*.log
+
+# ====================
+# ASP.NET Scaffolding
+# ====================
+ScaffoldingReadMe.txt
+
+# ====================
+# Development App Settings
+# ====================
+appsettings.Development.json
