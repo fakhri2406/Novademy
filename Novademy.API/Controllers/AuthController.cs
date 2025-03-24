@@ -154,17 +154,17 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Clear all refresh tokens
     /// </summary>
-    /// <param name="userId"></param>
+    /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("logout/{userId}")]
+    [HttpPost("logout/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Logout([FromRoute] Guid userId)
+    public async Task<IActionResult> Logout([FromRoute] Guid id)
     {
         try
         {
-            await _repo.RemoveAllRefreshTokensAsync(userId);
+            await _repo.RemoveAllRefreshTokensAsync(id);
             return Ok("User logged out.");
         }
         catch (KeyNotFoundException ex)
