@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
         _repo = repo;
         _tokenGenerator = tokenGenerator;
     }
-
+    
     #region Register
     
     /// <summary>
@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
+    
     #endregion
     
     #region Login
@@ -64,7 +64,7 @@ public class AuthController : ControllerBase
         try
         {
             var user = await _repo.LoginUserAsync(request.Username, request.Password);
-    
+            
             var accessToken = _tokenGenerator.GenerateAccessToken(user);
             var refreshToken = new RefreshToken
             {
@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
                 ExpiresAt = DateTime.UtcNow.AddDays(30),
                 UserId = user.Id
             };
-    
+            
             await _repo.CreateRefreshTokenAsync(refreshToken);
     
             var response = new AuthResponse
@@ -80,7 +80,7 @@ public class AuthController : ControllerBase
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token
             };
-    
+            
             return Ok(response);
         }
         catch (KeyNotFoundException ex)
@@ -111,13 +111,13 @@ public class AuthController : ControllerBase
         try
         {
             var currentRefreshToken = await _repo.GetRefreshTokenAsync(request.Token);
-    
+            
             if (currentRefreshToken.ExpiresAt < DateTime.UtcNow)
             {
                 await _repo.RemoveRefreshTokenAsync(currentRefreshToken.Token);
                 return Unauthorized("Expired refresh token. Please log in again.");
             }
-    
+            
             var newAccessToken = _tokenGenerator.GenerateAccessToken(currentRefreshToken.User!);
             var newRefreshToken = new RefreshToken
             {
@@ -125,16 +125,16 @@ public class AuthController : ControllerBase
                 ExpiresAt = DateTime.UtcNow.AddDays(30),
                 UserId = currentRefreshToken.UserId
             };
-    
+            
             await _repo.CreateRefreshTokenAsync(newRefreshToken);
             await _repo.RemoveRefreshTokenAsync(currentRefreshToken.Token);
-    
+            
             var response = new AuthResponse
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken.Token
             };
-    
+            
             return Ok(response);
         }
         catch (KeyNotFoundException ex)

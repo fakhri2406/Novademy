@@ -22,7 +22,7 @@ public static class ContractMapping
             RoleId = request.RoleId
         };
     }
-
+    
     public static Course MapToCourse(this CreateCourseRequest request)
     {
         return new Course()
@@ -31,7 +31,7 @@ public static class ContractMapping
             Description = request.Description,
         };
     }
-
+    
     public static CourseResponse MapToCourseResponse(this Course course)
     {
         return new CourseResponse()
@@ -41,7 +41,7 @@ public static class ContractMapping
             Description = course.Description,
         };
     }
-
+    
     public static Lesson MapToLesson(this CreateLessonRequest request)
     {
         return new Lesson()
@@ -52,7 +52,7 @@ public static class ContractMapping
             CourseId = request.CourseId,
         };
     }
-
+    
     public static LessonResponse MapToLessonResponse(this Lesson lesson)
     {
         return new LessonResponse()

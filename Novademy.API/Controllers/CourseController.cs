@@ -17,7 +17,7 @@ public class CourseController : ControllerBase
     {
         _repo = repo;
     }
-
+    
     #region GET
     
     /// <summary>
@@ -99,7 +99,7 @@ public class CourseController : ControllerBase
     #endregion
     
     #region PUT
-
+    
     /// <summary>
     /// Update an existing course
     /// </summary>
@@ -135,11 +135,11 @@ public class CourseController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
+    
     #endregion
     
     #region DELETE
-
+    
     /// <summary>
     /// Delete a course by ID
     /// </summary>

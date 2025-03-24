@@ -17,9 +17,9 @@ public class LessonController : ControllerBase
     {
         _repo = repo;
     }
-
+    
     #region GET
-
+    
     /// <summary>
     /// Get all lessons of a specific course
     /// </summary>
@@ -65,7 +65,7 @@ public class LessonController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
+    
     #endregion
     
     #region POST
@@ -118,13 +118,13 @@ public class LessonController : ControllerBase
         try
         {
             var lessonToUpdate = await _repo.GetLessonByIdAsync(id);
-    
+            
             lessonToUpdate!.Title = request.Title;
             lessonToUpdate.Description = request.Description;
             lessonToUpdate.VideoUrl = request.VideoUrl;
-    
+            
             var updatedLesson = await _repo.UpdateLessonAsync(lessonToUpdate);
-        
+            
             var response = updatedLesson!.MapToLessonResponse();
             return Ok(response);
         }

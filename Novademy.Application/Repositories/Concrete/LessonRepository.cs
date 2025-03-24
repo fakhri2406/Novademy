@@ -13,9 +13,9 @@ public class LessonRepository : ILessonRepository
     {
         _context = context;
     }
-
+    
     #region Create
-
+    
     public async Task<Lesson> CreateLessonAsync(Lesson lesson)
         {
             lesson.Id = Guid.NewGuid();
@@ -25,7 +25,7 @@ public class LessonRepository : ILessonRepository
             
             return lesson;
         }
-
+    
     #endregion
     
     #region Read
@@ -60,11 +60,11 @@ public class LessonRepository : ILessonRepository
     #endregion
     
     #region Delete
-
+    
     public async Task DeleteLessonAsync(Guid id)
     {
         var lesson = await _context.Lessons.FindAsync(id);
-
+        
         if (lesson is null)
         {
             throw new KeyNotFoundException("Invalid Lesson ID.");

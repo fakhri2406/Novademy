@@ -13,9 +13,9 @@ public class CourseRepository : ICourseRepository
     {
         _context = context;
     }
-
+    
     #region Create
-
+    
     public async Task<Course> CreateCourseAsync(Course course)
         {
             course.Id = Guid.NewGuid();
@@ -25,7 +25,7 @@ public class CourseRepository : ICourseRepository
             
             return course;
         }
-
+    
     #endregion
     
     #region Read
@@ -47,7 +47,7 @@ public class CourseRepository : ICourseRepository
     #endregion
     
     #region Update
-
+    
     public async Task<Course?> UpdateCourseAsync(Course course)
     {
         _context.Courses.Update(course);
@@ -58,11 +58,11 @@ public class CourseRepository : ICourseRepository
     #endregion
     
     #region Delete
-
+    
     public async Task DeleteCourseAsync(Guid id)
     {
         var course = await _context.Courses.FindAsync(id);
-
+        
         if (course is null)
         {
             throw new KeyNotFoundException("Invalid Course ID.");

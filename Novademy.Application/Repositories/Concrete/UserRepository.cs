@@ -9,27 +9,27 @@ namespace Novademy.Application.Repositories.Concrete;
 public class UserRepository : IUserRepository
 {
     private readonly AppDbContext _context;
-        
+    
     public UserRepository(AppDbContext context)
     {
         _context = context;
     }
-
+    
     #region Register
-
+    
     public async Task<User> RegisterUserAsync(User user)
     {
         user.Id = Guid.NewGuid();
         
         user.Salt = Guid.NewGuid().ToString();
         user.Password = Hasher.HashPassword($"{user.Password}{user.Salt}");
-            
+        
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
-            
+        
         return user;
     }
-
+    
     #endregion
     
     #region Login
@@ -44,13 +44,13 @@ public class UserRepository : IUserRepository
         {
             throw new KeyNotFoundException("Invalid username or password.");
         }
-            
+        
         var hashedPassword = Hasher.HashPassword($"{password}{loggedInUser.Salt}");
         if (hashedPassword != loggedInUser.Password)
         {
             throw new KeyNotFoundException("Invalid password.");
         }
-            
+        
         return loggedInUser;
     }
     
