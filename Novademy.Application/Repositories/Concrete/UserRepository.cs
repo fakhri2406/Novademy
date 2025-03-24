@@ -19,6 +19,8 @@ public class UserRepository : IUserRepository
 
     public async Task<User> RegisterUserAsync(User user)
     {
+        user.Id = Guid.NewGuid();
+        
         user.Salt = Guid.NewGuid().ToString();
         user.Password = Hasher.HashPassword($"{user.Password}{user.Salt}");
             

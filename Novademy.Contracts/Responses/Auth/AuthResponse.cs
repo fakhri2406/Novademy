@@ -1,4 +1,4 @@
-namespace Novademy.Contracts.Responses;
+namespace Novademy.Contracts.Responses.Auth;
 
 public class AuthResponse
 {

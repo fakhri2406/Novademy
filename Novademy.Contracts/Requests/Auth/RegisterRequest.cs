@@ -1,4 +1,4 @@
-namespace Novademy.Contracts.Requests;
+namespace Novademy.Contracts.Requests.Auth;
 
 public class RegisterRequest
 {

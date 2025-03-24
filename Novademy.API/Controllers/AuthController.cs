@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Tokens;
-using Novademy.Contracts.Requests;
-using Novademy.Contracts.Responses;
+using Novademy.Contracts.Requests.Auth;
+using Novademy.Contracts.Responses.Auth;
 using Novademy.API.Mapping;
 
 namespace Novademy.API.Controllers;

@@ -12,6 +12,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
         
         return services;
