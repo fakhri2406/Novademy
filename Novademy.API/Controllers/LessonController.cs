@@ -32,9 +32,20 @@ public class LessonController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetLessons([FromRoute] Guid courseId)
     {
-        var lessons = await _repo.GetLessonsByCourseIdAsync(courseId);
-        var responses = lessons.Select(l => l.MapToLessonResponse());
-        return responses.Any() ? Ok(responses) : NoContent();
+        try
+        {
+            var lessons = await _repo.GetLessonsByCourseIdAsync(courseId);
+            var responses = lessons.Select(l => l.MapToLessonResponse());
+            return responses.Any() ? Ok(responses) : NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     
     /// <summary>

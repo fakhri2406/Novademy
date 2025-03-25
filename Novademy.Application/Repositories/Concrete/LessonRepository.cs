@@ -32,6 +32,10 @@ public class LessonRepository : ILessonRepository
     
     public async Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(Guid courseId)
     {
+        if (!_context.Courses.Any(c => c.Id == courseId))
+        {
+            throw new KeyNotFoundException("Invalid Course ID.");
+        }
         return await _context.Lessons
             .Where(l => l.CourseId == courseId)
             .ToListAsync();
