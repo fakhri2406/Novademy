@@ -14,6 +14,7 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
+        services.AddScoped<IPackageRepository, PackageRepository>();
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
         
         return services;

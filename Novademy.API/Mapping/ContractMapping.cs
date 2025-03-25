@@ -2,8 +2,10 @@ using Novademy.Application.Models;
 using Novademy.Contracts.Requests.Auth;
 using Novademy.Contracts.Requests.Course;
 using Novademy.Contracts.Requests.Lesson;
+using Novademy.Contracts.Requests.Package;
 using Novademy.Contracts.Responses.Course;
 using Novademy.Contracts.Responses.Lesson;
+using Novademy.Contracts.Responses.Package;
 
 namespace Novademy.API.Mapping;
 
@@ -62,6 +64,28 @@ public static class ContractMapping
             Description = lesson.Description,
             VideoUrl = lesson.VideoUrl,
             CourseId = lesson.CourseId,
+        };
+    }
+    
+    public static Package MapToPackage(this CreatePackageRequest request)
+    {
+        return new Package()
+        {
+            Title = request.Title,
+            Description = request.Description,
+            Price = request.Price,
+        };
+    }
+    
+    public static PackageResponse MapToPackageResponse(this Package package)
+    {
+        return new PackageResponse()
+        {
+            Id = package.Id,
+            Title = package.Title,
+            Description = package.Description,
+            Price = package.Price,
+            CourseIds = package.Courses.Select(c => c.Id).ToList(),
         };
     }
 }

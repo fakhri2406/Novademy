@@ -2,13 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Novademy.Application.Models;
 
-public class Course
+public class Package
 {
     [Key]
     public Guid Id { get; set; }
     [Required]
     public string Title { get; set; }
-    [Required]
     public string Description { get; set; }
-    public IEnumerable<Course?> Courses { get; set; } = new List<Course>();
+    [Required]
+    public decimal Price { get; set; }
+    public ICollection<Course?> Courses { get; set; }
 }
