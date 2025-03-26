@@ -10,8 +10,8 @@ public class RegisterRequest
     public required string LastName { get; init; }
     public required string Email { get; init; }
     public required int PhoneNumber { get; init; }
-    public required int RoleId { get; set; }
-    public int Group { get; set; }
-    public SectorType Sector { get; set; }
-    public string? ProfilePictureUrl { get; set; }
+    public required int RoleId { get; init; }
+    public int Group { get; init; }
+    public SectorType Sector { get; init; }
+    public string? ProfilePictureUrl { get; init; }
 }

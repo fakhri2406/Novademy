@@ -26,7 +26,7 @@ public class User
     public int Group { get; set; }
     public SectorType Sector { get; set; }
     public string? ProfilePictureUrl { get; set; }
-    public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
+    public DateTime RegisteredAt { get; set; }
     public DateTime? LastLoginAt { get; set; }
     [Required]
     public int RoleId { get; set; }
