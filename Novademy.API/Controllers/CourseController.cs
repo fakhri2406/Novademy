@@ -120,6 +120,9 @@ public class CourseController : ControllerBase
             
             courseToUpdate!.Title = request.Title;
             courseToUpdate.Description = request.Description;
+            courseToUpdate.Subject = request.Subject;
+            courseToUpdate.ImageUrl = request.ImageUrl;
+            courseToUpdate.UpdatedAt = DateTime.UtcNow;
             
             var updatedCourse = await _repo.UpdateCourseAsync(courseToUpdate);
             

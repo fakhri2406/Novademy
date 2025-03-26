@@ -133,6 +133,10 @@ public class LessonController : ControllerBase
             lessonToUpdate!.Title = request.Title;
             lessonToUpdate.Description = request.Description;
             lessonToUpdate.VideoUrl = request.VideoUrl;
+            lessonToUpdate.Order = request.Order;
+            lessonToUpdate.Transcript = request.Transcript;
+            lessonToUpdate.ImageUrl = request.ImageUrl;
+            lessonToUpdate.UpdatedAt = DateTime.UtcNow;
             
             var updatedLesson = await _repo.UpdateLessonAsync(lessonToUpdate);
             

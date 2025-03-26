@@ -135,11 +135,13 @@ public class PackageController : ControllerBase
         try
         {
             var packageToUpdate = await _repo.GetPackageByIdAsync(id);
-
+            
             packageToUpdate!.Title = request.Title;
             packageToUpdate.Description = request.Description;
             packageToUpdate.Price = request.Price;
-
+            packageToUpdate.ImageUrl = request.ImageUrl;
+            packageToUpdate.UpdatedAt = DateTime.UtcNow;
+            
             packageToUpdate.Courses.Clear();
             foreach (var courseId in request.CourseIds)
             {
@@ -149,9 +151,9 @@ public class PackageController : ControllerBase
                     packageToUpdate.Courses.Add(course);
                 }
             }
-
+            
             var updatedPackage = await _repo.UpdatePackageAsync(packageToUpdate);
-
+            
             var response = updatedPackage!.MapToPackageResponse();
             return Ok(response);
         }

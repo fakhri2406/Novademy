@@ -23,7 +23,11 @@ public static class ContractMapping
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
             Password = request.Password,
-            RoleId = request.RoleId
+            RoleId = request.RoleId,
+            Group = request.Group,
+            Sector = request.Sector,
+            ProfilePictureUrl = request.ProfilePictureUrl,
+            RegisteredAt = DateTime.UtcNow
         };
     }
 
@@ -37,6 +41,10 @@ public static class ContractMapping
         {
             Title = request.Title,
             Description = request.Description,
+            Subject = request.Subject,
+            ImageUrl = request.ImageUrl,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
     }
     
@@ -47,6 +55,10 @@ public static class ContractMapping
             Id = course.Id,
             Title = course.Title,
             Description = course.Description,
+            Subject = course.Subject,
+            ImageUrl = course.ImageUrl,
+            CreatedAt = course.CreatedAt,
+            UpdatedAt = course.UpdatedAt
         };
     }
     
@@ -61,7 +73,12 @@ public static class ContractMapping
             Title = request.Title,
             Description = request.Description,
             VideoUrl = request.VideoUrl,
+            Order = request.Order,
+            Transcript = request.Transcript,
+            ImageUrl = request.ImageUrl,
             CourseId = request.CourseId,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
     }
     
@@ -73,6 +90,11 @@ public static class ContractMapping
             Title = lesson.Title,
             Description = lesson.Description,
             VideoUrl = lesson.VideoUrl,
+            Order = lesson.Order,
+            Transcript = lesson.Transcript,
+            ImageUrl = lesson.ImageUrl,
+            CreatedAt = lesson.CreatedAt,
+            UpdatedAt = lesson.UpdatedAt,
             CourseId = lesson.CourseId,
         };
     }
@@ -88,6 +110,9 @@ public static class ContractMapping
             Title = request.Title,
             Description = request.Description,
             Price = request.Price,
+            ImageUrl = request.ImageUrl,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
     }
     
@@ -99,7 +124,10 @@ public static class ContractMapping
             Title = package.Title,
             Description = package.Description,
             Price = package.Price,
-            CourseIds = package.Courses.Select(c => c.Id).ToList()
+            ImageUrl = package.ImageUrl,
+            CreatedAt = package.CreatedAt,
+            UpdatedAt = package.UpdatedAt,
+            CourseIds = package.Courses.Select(c => c.Id).ToList(),
         };
     }
     
