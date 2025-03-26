@@ -11,6 +11,8 @@ namespace Novademy.API.Mapping;
 
 public static class ContractMapping
 {
+    #region User
+
     public static User MapToUser(this RegisterRequest request)
     {
         return new User
@@ -24,6 +26,10 @@ public static class ContractMapping
             RoleId = request.RoleId
         };
     }
+
+    #endregion
+    
+    #region Course
     
     public static Course MapToCourse(this CreateCourseRequest request)
     {
@@ -43,6 +49,10 @@ public static class ContractMapping
             Description = course.Description,
         };
     }
+    
+    #endregion
+    
+    #region Lesson
     
     public static Lesson MapToLesson(this CreateLessonRequest request)
     {
@@ -67,6 +77,10 @@ public static class ContractMapping
         };
     }
     
+    #endregion
+    
+    #region Package
+    
     public static Package MapToPackage(this CreatePackageRequest request)
     {
         return new Package()
@@ -85,7 +99,9 @@ public static class ContractMapping
             Title = package.Title,
             Description = package.Description,
             Price = package.Price,
-            CourseIds = package.Courses.Select(c => c.Id).ToList(),
+            CourseIds = package.Courses.Select(c => c!.Id).ToList(),
         };
     }
+    
+    #endregion
 }

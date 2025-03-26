@@ -1,5 +1,3 @@
-using System.Data.SqlTypes;
-
 namespace Novademy.Contracts.Requests.Package;
 
 public class CreatePackageRequest
