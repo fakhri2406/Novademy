@@ -20,7 +20,7 @@ public class PackageController : ControllerBase
         _repo = repo;
         _courseRepo = courseRepo;
     }
-
+    
     #region GET
 
     /// <summary>
@@ -88,16 +88,15 @@ public class PackageController : ControllerBase
         var package = request.MapToPackage();
         try
         {
-            var courses = new List<Course>();
+            package.Courses = new List<Course>();
             foreach (var courseId in request.CourseIds)
             {
                 var course = await _courseRepo.GetCourseByIdAsync(courseId);
                 if (course is not null)
                 {
-                    courses.Add(course);
+                    package.Courses.Add(course);
                 }
             }
-            package.Courses = courses!;
             
             var createdPackage = await _repo.CreatePackageAsync(package);
             
@@ -139,6 +138,7 @@ public class PackageController : ControllerBase
 
             packageToUpdate!.Title = request.Title;
             packageToUpdate.Description = request.Description;
+            packageToUpdate.Price = request.Price;
 
             packageToUpdate.Courses.Clear();
             foreach (var courseId in request.CourseIds)

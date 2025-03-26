@@ -10,5 +10,5 @@ public class Course
     public string Title { get; set; }
     [Required]
     public string Description { get; set; }
-    public IEnumerable<Course?> Courses { get; set; } = new List<Course>();
+    public ICollection<Package> Packages { get; set; } = new List<Package>();
 }

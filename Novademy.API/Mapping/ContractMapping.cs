@@ -99,7 +99,7 @@ public static class ContractMapping
             Title = package.Title,
             Description = package.Description,
             Price = package.Price,
-            CourseIds = package.Courses.Select(c => c!.Id).ToList(),
+            CourseIds = package.Courses.Select(c => c.Id).ToList()
         };
     }
     

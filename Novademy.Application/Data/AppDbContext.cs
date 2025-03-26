@@ -21,6 +21,9 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         
-        modelBuilder.Entity<Package>().HasMany(p => p.Courses).WithMany();
+        modelBuilder.Entity<Course>()
+            .HasMany(c => c.Packages)
+            .WithMany(p => p.Courses)
+            .UsingEntity(j => j.ToTable("CoursePackages"));
     }
 }

@@ -8,8 +8,9 @@ public class Package
     public Guid Id { get; set; }
     [Required]
     public string Title { get; set; }
+    [Required]
     public string Description { get; set; }
     [Required]
     public decimal Price { get; set; }
-    public ICollection<Course?> Courses { get; set; }
+    public ICollection<Course> Courses { get; set; } = new List<Course>();
 }

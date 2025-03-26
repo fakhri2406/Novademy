@@ -27,23 +27,20 @@ namespace Novademy.Application.Migrations
                     b.Property<Guid>("CoursesId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PackageId")
+                    b.Property<Guid>("PackagesId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("CoursesId", "PackageId");
+                    b.HasKey("CoursesId", "PackagesId");
 
-                    b.HasIndex("PackageId");
+                    b.HasIndex("PackagesId");
 
-                    b.ToTable("CoursePackage");
+                    b.ToTable("CoursePackages", (string)null);
                 });
 
             modelBuilder.Entity("Novademy.Application.Models.Course", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("CourseId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
@@ -55,8 +52,6 @@ namespace Novademy.Application.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
 
                     b.ToTable("Courses");
                 });
@@ -203,16 +198,9 @@ namespace Novademy.Application.Migrations
 
                     b.HasOne("Novademy.Application.Models.Package", null)
                         .WithMany()
-                        .HasForeignKey("PackageId")
+                        .HasForeignKey("PackagesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Novademy.Application.Models.Course", b =>
-                {
-                    b.HasOne("Novademy.Application.Models.Course", null)
-                        .WithMany("Courses")
-                        .HasForeignKey("CourseId");
                 });
 
             modelBuilder.Entity("Novademy.Application.Models.Lesson", b =>
@@ -246,11 +234,6 @@ namespace Novademy.Application.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("Novademy.Application.Models.Course", b =>
-                {
-                    b.Navigation("Courses");
                 });
 #pragma warning restore 612, 618
         }
