@@ -8,7 +8,7 @@ namespace Novademy.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Admin,Teacher")]
+[Authorize(Roles = "Admin")]
 public class CourseController : ControllerBase
 {
     private readonly ICourseRepository _repo;
