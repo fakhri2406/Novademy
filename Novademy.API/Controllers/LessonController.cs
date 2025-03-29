@@ -8,14 +8,16 @@ namespace Novademy.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Admin,Teacher")]
+[Authorize]
 public class LessonController : ControllerBase
 {
     private readonly ILessonRepository _repo;
+    private readonly ISubscriptionRepository _subscriptionRepo;
     
-    public LessonController(ILessonRepository repo)
+    public LessonController(ILessonRepository repo, ISubscriptionRepository subscriptionRepo)
     {
         _repo = repo;
+        _subscriptionRepo = subscriptionRepo;
     }
     
     #region GET
@@ -64,7 +66,18 @@ public class LessonController : ControllerBase
         try
         {
             var lesson = await _repo.GetLessonByIdAsync(id);
-            var response = lesson!.MapToLessonResponse();
+            
+            if (!lesson!.IsFree)
+            {
+                var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
+                var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForLessonAsync(userId, id);
+                if (!hasAccess)
+                {
+                    return Forbid("You do not have access to this lesson.");
+                }
+            }
+            
+            var response = lesson.MapToLessonResponse();
             return Ok(response);
         }
         catch (KeyNotFoundException ex)
@@ -91,6 +104,7 @@ public class LessonController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateLesson([FromForm] CreateLessonRequest request)
     {
         var lesson = request.MapToLesson();
@@ -124,6 +138,7 @@ public class LessonController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> UpdateLesson([FromRoute] Guid id, [FromBody] UpdateLessonRequest request)
     {
         try
@@ -168,6 +183,7 @@ public class LessonController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> DeleteLesson([FromRoute] Guid id)
     {
         try

@@ -3,6 +3,7 @@ using Novademy.Contracts.Requests.Auth;
 using Novademy.Contracts.Requests.Course;
 using Novademy.Contracts.Requests.Lesson;
 using Novademy.Contracts.Requests.Package;
+using Novademy.Contracts.Requests.Subscription;
 using Novademy.Contracts.Responses.Course;
 using Novademy.Contracts.Responses.Lesson;
 using Novademy.Contracts.Responses.Package;
@@ -128,6 +129,19 @@ public static class ContractMapping
             CreatedAt = package.CreatedAt,
             UpdatedAt = package.UpdatedAt,
             CourseIds = package.Courses.Select(c => c.Id).ToList(),
+        };
+    }
+    
+    #endregion
+    
+    #region Subscription
+    
+    public static Subscription MapToSubscription(this SubscribeRequest request)
+    {
+        return new Subscription()
+        {
+            UserId = request.UserId,
+            PackageId = request.PackageId
         };
     }
     

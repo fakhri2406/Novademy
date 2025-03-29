@@ -8,14 +8,16 @@ namespace Novademy.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class CourseController : ControllerBase
 {
     private readonly ICourseRepository _repo;
+    private readonly ISubscriptionRepository _subscriptionRepo;
     
-    public CourseController(ICourseRepository repo)
+    public CourseController(ICourseRepository repo, ISubscriptionRepository subscriptionRepo)
     {
         _repo = repo;
+        _subscriptionRepo = subscriptionRepo;
     }
     
     #region GET
@@ -29,6 +31,7 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetCourses()
     {
         var courses = await _repo.GetAllCoursesAsync();
@@ -52,6 +55,14 @@ public class CourseController : ControllerBase
         try
         {
             var course = await _repo.GetCourseByIdAsync(id);
+            
+            var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
+            var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForCourseAsync(userId, id);
+            if (!hasAccess)
+            {
+                return Forbid("You do not have access to this course.");
+            }
+            
             var response = course!.MapToCourseResponse();
             return Ok(response);
         }
@@ -79,6 +90,7 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateCourse([FromForm] CreateCourseRequest request)
     {
         var course = request.MapToCourse();
@@ -112,6 +124,7 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCourse([FromRoute] Guid id, [FromBody] UpdateCourseRequest request)
     {
         try
@@ -154,6 +167,7 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteCourse([FromRoute] Guid id)
     {
         try

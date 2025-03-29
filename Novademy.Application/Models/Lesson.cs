@@ -14,6 +14,7 @@ public class Lesson
     public string VideoUrl { get; set; }
     [Required]
     public int Order { get; set; }
+    public bool IsFree { get; set; } = false;
     public string? Transcript { get; set; }
     public string? ImageUrl { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

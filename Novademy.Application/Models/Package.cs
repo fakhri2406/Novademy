@@ -16,4 +16,5 @@ public class Package
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<Course> Courses { get; set; } = new List<Course>();
+    public ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
 }

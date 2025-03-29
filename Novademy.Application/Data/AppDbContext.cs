@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
     public DbSet<Package> Packages { get; set; }
+    public DbSet<Subscription> Subscriptions { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -25,5 +26,15 @@ public class AppDbContext : DbContext
             .HasMany(c => c.Packages)
             .WithMany(p => p.Courses)
             .UsingEntity(j => j.ToTable("CoursePackages"));
+        
+        modelBuilder.Entity<Subscription>()
+            .HasOne(s => s.User)
+            .WithMany(u => u.Subscriptions)
+            .HasForeignKey(s => s.UserId);
+        
+        modelBuilder.Entity<Subscription>()
+            .HasOne(s => s.Package)
+            .WithMany(p => p.Subscriptions)
+            .HasForeignKey(s => s.PackageId);
     }
 }

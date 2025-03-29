@@ -31,4 +31,5 @@ public class User
     [Required]
     public int RoleId { get; set; }
     public Role? Role { get; set; }
+    public ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
 }
