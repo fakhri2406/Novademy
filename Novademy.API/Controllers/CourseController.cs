@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.API.Mapping;
@@ -13,11 +14,19 @@ public class CourseController : ControllerBase
 {
     private readonly ICourseRepository _repo;
     private readonly ISubscriptionRepository _subscriptionRepo;
+    private readonly IValidator<CreateCourseRequest> _createValidator;
+    private readonly IValidator<UpdateCourseRequest> _updateValidator;
     
-    public CourseController(ICourseRepository repo, ISubscriptionRepository subscriptionRepo)
+    public CourseController(
+        ICourseRepository repo,
+        ISubscriptionRepository subscriptionRepo,
+        IValidator<CreateCourseRequest> createValidator,
+        IValidator<UpdateCourseRequest> updateValidator)
     {
         _repo = repo;
         _subscriptionRepo = subscriptionRepo;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
     }
     
     #region GET
@@ -93,6 +102,12 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateCourse([FromForm] CreateCourseRequest request)
     {
+        var validationResult = await _createValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         var course = request.MapToCourse();
         try
         {
@@ -127,6 +142,12 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCourse([FromRoute] Guid id, [FromBody] UpdateCourseRequest request)
     {
+        var validationResult = await _updateValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         try
         {
             var courseToUpdate = await _repo.GetCourseByIdAsync(id);

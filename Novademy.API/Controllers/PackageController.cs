@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.Application.Models;
@@ -14,11 +15,19 @@ public class PackageController : ControllerBase
 {
     private readonly IPackageRepository _repo;
     private readonly ICourseRepository _courseRepo;
+    private readonly IValidator<CreatePackageRequest> _createValidator;
+    private readonly IValidator<UpdatePackageRequest> _updateValidator;
     
-    public PackageController(IPackageRepository repo, ICourseRepository courseRepo)
+    public PackageController(
+        IPackageRepository repo,
+        ICourseRepository courseRepo,
+        IValidator<CreatePackageRequest> createValidator,
+        IValidator<UpdatePackageRequest> updateValidator)
     {
         _repo = repo;
         _courseRepo = courseRepo;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
     }
     
     #region GET
@@ -85,6 +94,12 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreatePackage([FromForm] CreatePackageRequest request)
     {
+        var validationResult = await _createValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         var package = request.MapToPackage();
         try
         {
@@ -132,6 +147,12 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> UpdatePackage([FromRoute] Guid id, [FromBody] UpdatePackageRequest request)
     {
+        var validationResult = await _updateValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         try
         {
             var packageToUpdate = await _repo.GetPackageByIdAsync(id);

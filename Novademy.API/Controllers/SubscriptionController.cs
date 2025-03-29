@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.API.Mapping;
@@ -12,12 +13,16 @@ namespace Novademy.API.Controllers;
 public class SubscriptionController : ControllerBase
 {
     private readonly ISubscriptionRepository _repo;
+    private readonly IValidator<SubscribeRequest> _subscribeValidator;
     
-    public SubscriptionController(ISubscriptionRepository repo)
+    public SubscriptionController(
+        ISubscriptionRepository repo,
+        IValidator<SubscribeRequest> subscribeValidator)
     {
         _repo = repo;
+        _subscribeValidator = subscribeValidator;
     }
-
+    
     #region POST
 
     /// <summary>
@@ -32,10 +37,15 @@ public class SubscriptionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Subscribe([FromBody] SubscribeRequest request)
     {
+        var validationResult = await _subscribeValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var subscription = request.MapToSubscription();
         try
         {
-            var subscription = request.MapToSubscription();
-            
             var createdSubscription = await _repo.CreateSubscriptionAsync(subscription);
             return CreatedAtAction(nameof(GetActiveSubscriptions), new { userId = createdSubscription.UserId },
                 $"User {createdSubscription.UserId} subscribed to package {createdSubscription.PackageId}.");

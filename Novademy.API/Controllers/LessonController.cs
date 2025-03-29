@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.Application.Repositories.Abstract;
@@ -13,11 +14,19 @@ public class LessonController : ControllerBase
 {
     private readonly ILessonRepository _repo;
     private readonly ISubscriptionRepository _subscriptionRepo;
+    private readonly IValidator<CreateLessonRequest> _createValidator;
+    private readonly IValidator<UpdateLessonRequest> _updateValidator;
     
-    public LessonController(ILessonRepository repo, ISubscriptionRepository subscriptionRepo)
+    public LessonController(
+        ILessonRepository repo,
+        ISubscriptionRepository subscriptionRepo,
+        IValidator<CreateLessonRequest> createValidator,
+        IValidator<UpdateLessonRequest> updateValidator)
     {
         _repo = repo;
         _subscriptionRepo = subscriptionRepo;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
     }
     
     #region GET
@@ -107,6 +116,12 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateLesson([FromForm] CreateLessonRequest request)
     {
+        var validationResult = await _createValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         var lesson = request.MapToLesson();
         try
         {
@@ -141,6 +156,12 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> UpdateLesson([FromRoute] Guid id, [FromBody] UpdateLessonRequest request)
     {
+        var validationResult = await _updateValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         try
         {
             var lessonToUpdate = await _repo.GetLessonByIdAsync(id);

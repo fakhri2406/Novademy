@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
@@ -14,11 +15,19 @@ public class AuthController : ControllerBase
 {
     private readonly IUserRepository _repo;
     private readonly ITokenGenerator _tokenGenerator;
+    private readonly IValidator<RegisterRequest> _registerValidator;
+    private readonly IValidator<LoginRequest> _loginValidator;
     
-    public AuthController(IUserRepository repo, ITokenGenerator tokenGenerator)
+    public AuthController(
+        IUserRepository repo,
+        ITokenGenerator tokenGenerator,
+        IValidator<RegisterRequest> registerValidator,
+        IValidator<LoginRequest> loginValidator)
     {
         _repo = repo;
         _tokenGenerator = tokenGenerator;
+        _registerValidator = registerValidator;
+        _loginValidator = loginValidator;
     }
     
     #region Register
@@ -33,6 +42,12 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromForm] RegisterRequest request)
     {
+        var validationResult = await _registerValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         var user = request.MapToUser();
         try
         {
@@ -61,6 +76,12 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login([FromForm] LoginRequest request)
     {
+        var validationResult = await _loginValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         try
         {
             var user = await _repo.LoginUserAsync(request.Username, request.Password);
