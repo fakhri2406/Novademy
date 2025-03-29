@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Novademy.Application.Data;
 using Novademy.Application.Repositories.Abstract;
@@ -8,9 +10,10 @@ namespace Novademy.Application.ServiceCollectionExtensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>();
+        services.AddDbContext<AppDbContext>(options => 
+            options.UseNpgsql(configuration.GetConnectionString("Default")));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
