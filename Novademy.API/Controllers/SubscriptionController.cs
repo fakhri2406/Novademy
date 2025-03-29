@@ -12,12 +12,10 @@ namespace Novademy.API.Controllers;
 public class SubscriptionController : ControllerBase
 {
     private readonly ISubscriptionRepository _repo;
-    private readonly IPackageRepository _packageRepo;
     
-    public SubscriptionController(ISubscriptionRepository repo, IPackageRepository packageRepo)
+    public SubscriptionController(ISubscriptionRepository repo)
     {
         _repo = repo;
-        _packageRepo = packageRepo;
     }
 
     #region POST
