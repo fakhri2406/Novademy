@@ -13,16 +13,23 @@ namespace Novademy.API.Mapping;
 public static class ContractMapping
 {
     #region User
-
+    
     public static User MapToUser(this RegisterRequest request)
     {
+        var phoneNumber = request.PhoneNumber;
+        if (phoneNumber.StartsWith("0"))
+        {
+            phoneNumber = phoneNumber.Substring(1);
+        }
+        var formattedPhoneNumber = "+994" + phoneNumber;
+        
         return new User
         {
             Username = request.Username,
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            PhoneNumber = request.PhoneNumber,
+            PhoneNumber = formattedPhoneNumber,
             Password = request.Password,
             RoleId = request.RoleId,
             Group = request.Group,
@@ -31,7 +38,7 @@ public static class ContractMapping
             RegisteredAt = DateTime.UtcNow
         };
     }
-
+    
     #endregion
     
     #region Course

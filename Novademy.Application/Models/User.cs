@@ -20,8 +20,7 @@ public class User
     [Required]
     public string Email { get; set; }
     [Required]
-    [Range(100000000, 999999999)]
-    public int PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; }
     [Range(1, 4)]
     public int Group { get; set; }
     public SectorType Sector { get; set; }
