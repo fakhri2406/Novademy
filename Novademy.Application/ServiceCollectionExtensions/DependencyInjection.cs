@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<IPackageRepository, PackageRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+        services.AddScoped<IQuizRepository, QuizRepository>();
         
         #endregion
         

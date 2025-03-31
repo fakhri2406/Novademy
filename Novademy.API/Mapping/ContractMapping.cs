@@ -3,6 +3,7 @@ using Novademy.Contracts.Requests.Auth;
 using Novademy.Contracts.Requests.Course;
 using Novademy.Contracts.Requests.Lesson;
 using Novademy.Contracts.Requests.Package;
+using Novademy.Contracts.Requests.Quiz;
 using Novademy.Contracts.Requests.Subscription;
 using Novademy.Contracts.Responses.Course;
 using Novademy.Contracts.Responses.Lesson;
@@ -153,4 +154,36 @@ public static class ContractMapping
     }
     
     #endregion
+    
+    #region Quiz
+    
+    public static Quiz MapToQuiz(this CreateQuizRequest request)
+    {
+        return new Quiz
+        {
+            Title = request.Title,
+            LessonId = request.LessonId
+        };
+    }
+    
+    #endregion
+    
+    public static Question MapToQuestion(this CreateQuestionRequest request)
+    {
+        return new Question
+        {
+            Text = request.Text,
+            QuizId = request.QuizId
+        };
+    }
+
+    public static Answer MapToAnswer(this CreateAnswerRequest request, Guid questionId)
+    {
+        return new Answer
+        {
+            Text = request.Text,
+            IsCorrect = request.IsCorrect,
+            QuestionId = questionId
+        };
+    }
 }
