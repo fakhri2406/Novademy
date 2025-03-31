@@ -13,11 +13,11 @@ namespace Novademy.API.Controllers;
 public class SubscriptionController : ControllerBase
 {
     private readonly ISubscriptionRepository _repo;
-    private readonly IValidator<SubscribeRequest> _subscribeValidator;
+    private readonly IValidator<SubscriptionRequest> _subscribeValidator;
     
     public SubscriptionController(
         ISubscriptionRepository repo,
-        IValidator<SubscribeRequest> subscribeValidator)
+        IValidator<SubscriptionRequest> subscribeValidator)
     {
         _repo = repo;
         _subscribeValidator = subscribeValidator;
@@ -35,7 +35,7 @@ public class SubscriptionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Subscribe([FromBody] SubscribeRequest request)
+    public async Task<IActionResult> Subscribe([FromBody] SubscriptionRequest request)
     {
         var validationResult = await _subscribeValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
@@ -47,8 +47,10 @@ public class SubscriptionController : ControllerBase
         try
         {
             var createdSubscription = await _repo.CreateSubscriptionAsync(subscription);
-            return CreatedAtAction(nameof(GetActiveSubscriptions), new { userId = createdSubscription.UserId },
-                $"User {createdSubscription.UserId} subscribed to package {createdSubscription.PackageId}.");
+            
+            var response = createdSubscription.MapToSubscriptionResponse();
+            return CreatedAtAction(nameof(GetActiveSubscriptions), new { userId = response.UserId },
+                $"User {response.UserId} subscribed to package {response.PackageId}.");
         }
         catch (KeyNotFoundException ex)
         {
@@ -79,7 +81,8 @@ public class SubscriptionController : ControllerBase
         try
         {
             var subscriptions = await _repo.GetActiveSubscriptionsByUserIdAsync(userId);
-            return subscriptions.Any() ? Ok(subscriptions) : NoContent();
+            var responses = subscriptions.Select(s => s.MapToSubscriptionResponse());
+            return responses.Any() ? Ok(responses) : NoContent();
         }
         catch (Exception ex)
         {

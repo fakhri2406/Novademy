@@ -3,7 +3,7 @@ using Novademy.Contracts.Requests.Subscription;
 
 namespace Novademy.Contracts.Validators.Subscription;
 
-public class SubscribeRequestValidator : AbstractValidator<SubscribeRequest>
+public class SubscribeRequestValidator : AbstractValidator<SubscriptionRequest>
 {
     public SubscribeRequestValidator()
     {

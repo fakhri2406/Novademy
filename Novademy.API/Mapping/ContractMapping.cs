@@ -8,6 +8,7 @@ using Novademy.Contracts.Requests.Subscription;
 using Novademy.Contracts.Responses.Course;
 using Novademy.Contracts.Responses.Lesson;
 using Novademy.Contracts.Responses.Package;
+using Novademy.Contracts.Responses.Subscription;
 
 namespace Novademy.API.Mapping;
 
@@ -144,12 +145,25 @@ public static class ContractMapping
     
     #region Subscription
     
-    public static Subscription MapToSubscription(this SubscribeRequest request)
+    public static Subscription MapToSubscription(this SubscriptionRequest request)
     {
         return new Subscription()
         {
             UserId = request.UserId,
             PackageId = request.PackageId
+        };
+    }
+    
+    public static SubscriptionResponse MapToSubscriptionResponse(this Subscription subscription)
+    {
+        return new SubscriptionResponse()
+        {
+            Id = subscription.Id,
+            UserId = subscription.UserId,
+            PackageId = subscription.PackageId,
+            StartDate = subscription.StartDate,
+            EndDate = subscription.EndDate,
+            IsActive = subscription.IsActive
         };
     }
     
@@ -165,8 +179,6 @@ public static class ContractMapping
             LessonId = request.LessonId
         };
     }
-    
-    #endregion
     
     public static Question MapToQuestion(this CreateQuestionRequest request)
     {
@@ -186,4 +198,6 @@ public static class ContractMapping
             QuestionId = questionId
         };
     }
+    
+    #endregion
 }
