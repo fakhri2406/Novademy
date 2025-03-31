@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.Application.Repositories.Abstract;
@@ -14,88 +15,278 @@ public class QuizController : ControllerBase
     private readonly IQuizRepository _quizRepo;
     private readonly IQuestionRepository _questionRepo;
     private readonly IAnswerRepository _answerRepo;
-    private readonly ILessonRepository _lessonRepo;
+    private readonly IValidator<CreateQuizRequest> _createQuizValidator;
+    private readonly IValidator<UpdateQuizRequest> _updateQuizValidator;
+    private readonly IValidator<CreateQuestionRequest> _createQuestionValidator;
+    private readonly IValidator<CreateAnswerRequest> _createAnswerValidator;
     
     public QuizController(
         IQuizRepository quizRepo,
         IQuestionRepository questionRepo,
         IAnswerRepository answerRepo,
-        ILessonRepository lessonRepo)
+        IValidator<CreateQuizRequest> createQuizValidator,
+        IValidator<UpdateQuizRequest> updateQuizValidator,
+        IValidator<CreateQuestionRequest> createQuestionValidator,
+        IValidator<CreateAnswerRequest> createAnswerValidator)
     {
         _quizRepo = quizRepo;
         _questionRepo = questionRepo;
         _answerRepo = answerRepo;
-        _lessonRepo = lessonRepo;
+        _createQuizValidator = createQuizValidator;
+        _updateQuizValidator = updateQuizValidator;
+        _createQuestionValidator = createQuestionValidator;
+        _createAnswerValidator = createAnswerValidator;
     }
     
+    #region GET (Quiz)
+    
+    /// <summary>
+    /// Get all quizzes of a specific lesson
+    /// </summary>
+    /// <param name="lessonId"></param>
+    /// <returns></returns>
     [HttpGet("lesson/{lessonId}")]
-    public async Task<IActionResult> GetQuizzesByLessonId(Guid lessonId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetQuizzes(Guid lessonId)
     {
         var quizzes = await _quizRepo.GetQuizzesByLessonIdAsync(lessonId);
         return quizzes.Any() ? Ok(quizzes) : NoContent();
     }
     
+    /// <summary>
+    /// Get one quiz by ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetQuiz(Guid id)
     {
-        var quiz = await _quizRepo.GetQuizByIdAsync(id);
-        return Ok(quiz);
+        try
+        {
+            var quiz = await _quizRepo.GetQuizByIdAsync(id);
+            return Ok(quiz);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     
+    #endregion
+    
+    #region POST (Quiz)
+    
+    /// <summary>
+    /// Create a quiz
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateQuiz([FromBody] CreateQuizRequest request)
     {
-        var lesson = await _lessonRepo.GetLessonByIdAsync(request.LessonId);
+        var validationResult = await _createQuizValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         var quiz = request.MapToQuiz();
-        var createdQuiz = await _quizRepo.CreateQuizAsync(quiz);
-        return CreatedAtAction(nameof(GetQuiz), new { id = createdQuiz.Id }, createdQuiz);
+        try
+        {
+            var createdQuiz = await _quizRepo.CreateQuizAsync(quiz);
+            return CreatedAtAction(nameof(GetQuiz), new { id = createdQuiz.Id }, createdQuiz);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     
+    #endregion
+    
+    #region PUT (Quiz)
+    
+    /// <summary>
+    /// Update an existing quiz
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> UpdateQuiz(Guid id, [FromBody] UpdateQuizRequest request)
     {
-        var quiz = await _quizRepo.GetQuizByIdAsync(id);
-        quiz.Title = request.Title;
-        await _quizRepo.UpdateQuizAsync(quiz);
-        return Ok(quiz);
+        var validationResult = await _updateQuizValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        try
+        {
+            var quiz = await _quizRepo.GetQuizByIdAsync(id);
+            
+            quiz!.Title = request.Title;
+            await _quizRepo.UpdateQuizAsync(quiz);
+            
+            return Ok(quiz);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     
+    #endregion
+    
+    #region DELETE (Quiz)
+    
+    /// <summary>
+    /// Delete a quiz
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> DeleteQuiz(Guid id)
     {
-        await _quizRepo.DeleteQuizAsync(id);
-        return NoContent();
+        try
+        {
+            await _quizRepo.DeleteQuizAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     
+    #endregion
+    
+    #region GET (Question)
+    
+    /// <summary>
+    /// Get all questions of a specific quiz
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("question/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetQuestion(Guid id)
+    {
+        try
+        {
+            var question = await _questionRepo.GetQuestionByIdAsync(id);
+            return Ok(question);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    #endregion
+    
+    #region POST (Question)
+    
+    /// <summary>
+    /// Create a question with answers
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("question")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateQuestion([FromBody] CreateQuestionRequest request)
     {
-        var quiz = await _quizRepo.GetQuizByIdAsync(request.QuizId);
+        var validationResult = await _createQuestionValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
         if (!request.Answers.Any(a => a.IsCorrect))
         {
             return BadRequest("A question must have at least one correct answer.");
         }
-
+        
         var question = request.MapToQuestion();
-        var createdQuestion = await _questionRepo.CreateQuestionAsync(question);
-
-        foreach (var answerRequest in request.Answers)
+        
+        try
         {
-            var answer = answerRequest.MapToAnswer(createdQuestion.Id);
-            await _answerRepo.CreateAnswerAsync(answer);
+            var createdQuestion = await _questionRepo.CreateQuestionAsync(question);
+            
+            foreach (var answerRequest in request.Answers)
+            {
+                var answerValidationResult = await _createAnswerValidator.ValidateAsync(answerRequest);
+                if (!answerValidationResult.IsValid)
+                {
+                    return BadRequest(answerValidationResult.Errors);
+                }
+                
+                var answer = answerRequest.MapToAnswer(createdQuestion.Id);
+                await _answerRepo.CreateAnswerAsync(answer);
+            }
+            
+            return CreatedAtAction(nameof(GetQuestion), new { id = createdQuestion.Id }, createdQuestion);
         }
-
-        return CreatedAtAction(nameof(GetQuestion), new { id = createdQuestion.Id }, createdQuestion);
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
-
-    [HttpGet("question/{id}")]
-    public async Task<IActionResult> GetQuestion(Guid id)
-    {
-        var question = await _questionRepo.GetQuestionByIdAsync(id);
-        return Ok(question);
-    }
+    
+    #endregion
 }
