@@ -76,7 +76,10 @@ public class LessonController : ControllerBase
         {
             var lesson = await _repo.GetLessonByIdAsync(id);
             
-            if (!lesson!.IsFree)
+            var isAdmin = User.IsInRole("Admin");
+            var isTeacher = User.IsInRole("Teacher");
+            
+            if ((!isAdmin || !isTeacher) && !lesson!.IsFree)
             {
                 var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
                 var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForLessonAsync(userId, id);
@@ -86,7 +89,7 @@ public class LessonController : ControllerBase
                 }
             }
             
-            var response = lesson.MapToLessonResponse();
+            var response = lesson!.MapToLessonResponse();
             return Ok(response);
         }
         catch (KeyNotFoundException ex)

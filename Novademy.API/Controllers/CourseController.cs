@@ -65,11 +65,17 @@ public class CourseController : ControllerBase
         {
             var course = await _repo.GetCourseByIdAsync(id);
             
-            var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
-            var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForCourseAsync(userId, id);
-            if (!hasAccess)
+            var isAdmin = User.IsInRole("Admin");
+            var isTeacher = User.IsInRole("Teacher");
+            
+            if (!isAdmin || !isTeacher)
             {
-                return Forbid("You do not have access to this course.");
+                var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
+                var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForCourseAsync(userId, id);
+                if (!hasAccess)
+                {
+                    return Forbid("You do not have access to this course.");
+                }
             }
             
             var response = course!.MapToCourseResponse();
