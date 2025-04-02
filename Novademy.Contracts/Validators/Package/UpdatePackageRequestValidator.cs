@@ -18,10 +18,6 @@ public class UpdatePackageRequestValidator  : AbstractValidator<UpdatePackageReq
         RuleFor(x => x.Price)
             .GreaterThan(0).WithMessage("Price must be a positive value.");
         
-        RuleFor(x => x.ImageUrl)
-            .Matches(@"^https?://[^\s/$.?#].[^\s]*$").WithMessage("Invalid URL format.")
-            .When(x => !string.IsNullOrEmpty(x.ImageUrl));
-        
         RuleFor(x => x.CourseIds)
             .NotEmpty().WithMessage("At least one Course ID is required.")
             .Must(ids => ids != null && ids.Any()).WithMessage("At least one Course ID is required.");

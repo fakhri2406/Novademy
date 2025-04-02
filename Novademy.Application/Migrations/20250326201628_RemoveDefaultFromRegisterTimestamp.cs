@@ -52,7 +52,7 @@ namespace Novademy.Application.Migrations
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
             migrationBuilder.AddColumn<string>(
-                name: "ImageUrl",
+                name: "Image",
                 table: "Packages",
                 type: "text",
                 nullable: true);
@@ -72,7 +72,7 @@ namespace Novademy.Application.Migrations
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
             migrationBuilder.AddColumn<string>(
-                name: "ImageUrl",
+                name: "Image",
                 table: "Lessons",
                 type: "text",
                 nullable: true);
@@ -105,7 +105,7 @@ namespace Novademy.Application.Migrations
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
             migrationBuilder.AddColumn<string>(
-                name: "ImageUrl",
+                name: "Image",
                 table: "Courses",
                 type: "text",
                 nullable: true);
@@ -153,7 +153,7 @@ namespace Novademy.Application.Migrations
                 table: "Packages");
 
             migrationBuilder.DropColumn(
-                name: "ImageUrl",
+                name: "Image",
                 table: "Packages");
 
             migrationBuilder.DropColumn(
@@ -165,7 +165,7 @@ namespace Novademy.Application.Migrations
                 table: "Lessons");
 
             migrationBuilder.DropColumn(
-                name: "ImageUrl",
+                name: "Image",
                 table: "Lessons");
 
             migrationBuilder.DropColumn(
@@ -185,7 +185,7 @@ namespace Novademy.Application.Migrations
                 table: "Courses");
 
             migrationBuilder.DropColumn(
-                name: "ImageUrl",
+                name: "Image",
                 table: "Courses");
 
             migrationBuilder.DropColumn(

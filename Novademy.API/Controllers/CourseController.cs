@@ -117,7 +117,7 @@ public class CourseController : ControllerBase
         var course = request.MapToCourse();
         try
         {
-            var createdCourse = await _repo.CreateCourseAsync(course);
+            var createdCourse = await _repo.CreateCourseAsync(course, request.Image!);
             
             var response = createdCourse.MapToCourseResponse();
             return CreatedAtAction(nameof(GetCourse), new { id = response.Id },
@@ -161,7 +161,6 @@ public class CourseController : ControllerBase
             courseToUpdate!.Title = request.Title;
             courseToUpdate.Description = request.Description;
             courseToUpdate.Subject = request.Subject;
-            courseToUpdate.ImageUrl = request.ImageUrl;
             courseToUpdate.UpdatedAt = DateTime.UtcNow;
             
             var updatedCourse = await _repo.UpdateCourseAsync(courseToUpdate);

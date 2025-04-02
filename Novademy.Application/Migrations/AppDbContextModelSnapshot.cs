@@ -73,7 +73,7 @@ namespace Novademy.Application.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("Image")
                         .HasColumnType("text");
 
                     b.Property<int>("Subject")
@@ -107,7 +107,7 @@ namespace Novademy.Application.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("Image")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsFree")
@@ -150,7 +150,7 @@ namespace Novademy.Application.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("Image")
                         .HasColumnType("text");
 
                     b.Property<decimal>("Price")

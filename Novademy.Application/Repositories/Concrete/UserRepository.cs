@@ -39,8 +39,8 @@ public class UserRepository : IUserRepository
         
         return user;
     }
-
-    private async Task<ImageUploadResult> UploadProfilePictureAsync(IFormFile file)
+    
+    public async Task<ImageUploadResult> UploadProfilePictureAsync(IFormFile file)
     {
         using var stream = file.OpenReadStream();
         var uploadParams = new ImageUploadParams

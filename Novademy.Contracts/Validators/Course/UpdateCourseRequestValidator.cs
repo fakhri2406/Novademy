@@ -15,9 +15,5 @@ public class UpdateCourseRequestValidator : AbstractValidator<UpdateCourseReques
         
         RuleFor(x => x.Subject)
             .IsInEnum().WithMessage("Subject is required.");
-        
-        RuleFor(x => x.ImageUrl)
-            .Matches(@"^https?://[^\s/$.?#].[^\s]*$").WithMessage("Invalid URL format.")
-            .When(x => !string.IsNullOrEmpty(x.ImageUrl));
     }
 }

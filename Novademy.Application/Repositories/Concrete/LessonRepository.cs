@@ -1,3 +1,6 @@
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Novademy.Application.Data;
 using Novademy.Application.Models;
@@ -8,23 +11,50 @@ namespace Novademy.Application.Repositories.Concrete;
 public class LessonRepository : ILessonRepository
 {
     private readonly AppDbContext _context;
+    private readonly CloudinaryDotNet.Cloudinary _cloudinary;
     
-    public LessonRepository(AppDbContext context)
+    public LessonRepository(AppDbContext context, CloudinaryDotNet.Cloudinary cloudinary)
     {
         _context = context;
+        _cloudinary = cloudinary;
     }
     
     #region Create
     
-    public async Task<Lesson> CreateLessonAsync(Lesson lesson)
+    public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile image)
+    {
+        lesson.Id = Guid.NewGuid();
+        
+        if (image is not null)
         {
-            lesson.Id = Guid.NewGuid();
-            
-            _context.Lessons.Add(lesson);
-            await _context.SaveChangesAsync();
-            
-            return lesson;
+            var uploadResult = await UploadImageAsync(image);
+            lesson.ImageUrl = uploadResult.SecureUrl.ToString();
         }
+        
+        _context.Lessons.Add(lesson);
+        await _context.SaveChangesAsync();
+        
+        return lesson;
+    }
+    
+    public async Task<ImageUploadResult> UploadImageAsync(IFormFile file)
+    {
+        using var stream = file.OpenReadStream();
+        var uploadParams = new ImageUploadParams
+        {
+            File = new FileDescription(file.FileName, stream),
+            Folder = "lessons",
+            PublicId = Guid.NewGuid().ToString()
+        };
+        
+        var result = await _cloudinary.UploadAsync(uploadParams);
+        if (result.Error != null)
+        {
+            throw new Exception(result.Error.Message);
+        }
+        
+        return result;
+    }
     
     #endregion
     

@@ -51,7 +51,6 @@ public static class ContractMapping
             Title = request.Title,
             Description = request.Description,
             Subject = request.Subject,
-            ImageUrl = request.ImageUrl,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -84,7 +83,6 @@ public static class ContractMapping
             VideoUrl = request.VideoUrl,
             Order = request.Order,
             Transcript = request.Transcript,
-            ImageUrl = request.ImageUrl,
             CourseId = request.CourseId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -119,7 +117,6 @@ public static class ContractMapping
             Title = request.Title,
             Description = request.Description,
             Price = request.Price,
-            ImageUrl = request.ImageUrl,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };

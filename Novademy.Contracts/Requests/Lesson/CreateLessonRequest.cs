@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace Novademy.Contracts.Requests.Lesson;
 
 public class CreateLessonRequest
@@ -7,6 +9,6 @@ public class CreateLessonRequest
     public required string VideoUrl { get; init; }
     public required int Order { get; init; }
     public string? Transcript { get; init; }
-    public string? ImageUrl { get; init; }
+    public IFormFile? Image { get; init; }
     public required Guid CourseId { get; init; }
 }

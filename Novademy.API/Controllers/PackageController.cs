@@ -113,7 +113,7 @@ public class PackageController : ControllerBase
                 }
             }
             
-            var createdPackage = await _repo.CreatePackageAsync(package);
+            var createdPackage = await _repo.CreatePackageAsync(package, request.Image!);
             
             var response = createdPackage.MapToPackageResponse();
             return CreatedAtAction(nameof(GetPackage), new { id = response.Id },
@@ -160,7 +160,6 @@ public class PackageController : ControllerBase
             packageToUpdate!.Title = request.Title;
             packageToUpdate.Description = request.Description;
             packageToUpdate.Price = request.Price;
-            packageToUpdate.ImageUrl = request.ImageUrl;
             packageToUpdate.UpdatedAt = DateTime.UtcNow;
             
             packageToUpdate.Courses.Clear();

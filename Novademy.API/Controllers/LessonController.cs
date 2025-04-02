@@ -128,7 +128,7 @@ public class LessonController : ControllerBase
         var lesson = request.MapToLesson();
         try
         {
-            var createdLesson = await _repo.CreateLessonAsync(lesson);
+            var createdLesson = await _repo.CreateLessonAsync(lesson, request.Image!);
             
             var response = createdLesson.MapToLessonResponse();
             return CreatedAtAction(nameof(GetLesson), new { id = response.Id },
@@ -174,7 +174,6 @@ public class LessonController : ControllerBase
             lessonToUpdate.VideoUrl = request.VideoUrl;
             lessonToUpdate.Order = request.Order;
             lessonToUpdate.Transcript = request.Transcript;
-            lessonToUpdate.ImageUrl = request.ImageUrl;
             lessonToUpdate.UpdatedAt = DateTime.UtcNow;
             
             var updatedLesson = await _repo.UpdateLessonAsync(lessonToUpdate);

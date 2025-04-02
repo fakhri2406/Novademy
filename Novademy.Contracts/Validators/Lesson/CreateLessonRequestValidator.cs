@@ -20,10 +20,6 @@ public class CreateLessonRequestValidator : AbstractValidator<CreateLessonReques
         RuleFor(x => x.Order)
             .GreaterThan(0).WithMessage("Order must be a positive number.");
         
-        RuleFor(x => x.ImageUrl)
-            .Matches(@"^https?://[^\s/$.?#].[^\s]*$").WithMessage("Invalid URL format.")
-            .When(x => !string.IsNullOrEmpty(x.ImageUrl));
-        
         RuleFor(x => x.CourseId)
             .NotEmpty().WithMessage("Course ID is required.");
     }
