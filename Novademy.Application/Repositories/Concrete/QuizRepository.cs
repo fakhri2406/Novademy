@@ -15,7 +15,7 @@ public class QuizRepository : IQuizRepository
     }
 
     #region Create
-
+    
     public async Task<Quiz> CreateQuizAsync(Quiz quiz)
     {
         quiz.Id = Guid.NewGuid();
@@ -25,7 +25,7 @@ public class QuizRepository : IQuizRepository
         
         return quiz;
     }
-
+    
     #endregion
     
     #region Read

@@ -12,6 +12,8 @@ public class AnswerRepository : IAnswerRepository
     {
         _context = context;
     }
+
+    #region Create
     
     public async Task<Answer> CreateAnswerAsync(Answer answer)
     {
@@ -22,4 +24,6 @@ public class AnswerRepository : IAnswerRepository
         
         return answer;
     }
+    
+    #endregion
 }

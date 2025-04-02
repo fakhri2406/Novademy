@@ -23,6 +23,34 @@ public class SubscriptionController : ControllerBase
         _subscribeValidator = subscribeValidator;
     }
     
+    #region GET
+    
+    /// <summary>
+    /// Get active subscriptions for a user
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    [HttpGet("active/{userId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetActiveSubscriptions([FromRoute] Guid userId)
+    {
+        try
+        {
+            var subscriptions = await _repo.GetActiveSubscriptionsByUserIdAsync(userId);
+            var responses = subscriptions.Select(s => s.MapToSubscriptionResponse());
+            return responses.Any() ? Ok(responses) : NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    #endregion
+    
     #region POST
 
     /// <summary>
@@ -62,33 +90,5 @@ public class SubscriptionController : ControllerBase
         }
     }
 
-    #endregion
-    
-    #region GET
-    
-    /// <summary>
-    /// Get active subscriptions for a user
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <returns></returns>
-    [HttpGet("active/{userId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetActiveSubscriptions([FromRoute] Guid userId)
-    {
-        try
-        {
-            var subscriptions = await _repo.GetActiveSubscriptionsByUserIdAsync(userId);
-            var responses = subscriptions.Select(s => s.MapToSubscriptionResponse());
-            return responses.Any() ? Ok(responses) : NoContent();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-    
     #endregion
 }

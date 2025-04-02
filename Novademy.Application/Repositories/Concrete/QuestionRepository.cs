@@ -14,6 +14,8 @@ public class QuestionRepository : IQuestionRepository
         _context = context;
     }
     
+    #region Create
+    
     public async Task<Question> CreateQuestionAsync(Question question)
     {
         question.Id = Guid.NewGuid();
@@ -23,6 +25,10 @@ public class QuestionRepository : IQuestionRepository
         
         return question;
     }
+    
+    #endregion
+    
+    #region Read
     
     public async Task<Question?> GetQuestionByIdAsync(Guid id)
     {
@@ -34,4 +40,6 @@ public class QuestionRepository : IQuestionRepository
             .Include(q => q.Answers)
             .FirstOrDefaultAsync(q => q.Id == id);
     }
+    
+    #endregion
 }

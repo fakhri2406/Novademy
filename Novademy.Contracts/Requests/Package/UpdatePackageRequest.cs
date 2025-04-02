@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Novademy.Contracts.Requests.Package;
 
 public class UpdatePackageRequest
