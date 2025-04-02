@@ -36,7 +36,6 @@ public static class ContractMapping
             RoleId = request.RoleId,
             Group = request.Group,
             Sector = request.Sector,
-            ProfilePictureUrl = request.ProfilePictureUrl,
             RegisteredAt = DateTime.UtcNow
         };
     }

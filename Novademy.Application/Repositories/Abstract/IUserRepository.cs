@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Http;
 using Novademy.Application.Models;
 
 namespace Novademy.Application.Repositories.Abstract;
 
 public interface IUserRepository
 {
-    Task<User> RegisterUserAsync(User user);
+    Task<User> RegisterUserAsync(User user, IFormFile profilePicture);
     Task<User> LoginUserAsync(string username, string password);
     Task<User> UpdateUserAsync(User user);
     Task CreateRefreshTokenAsync(RefreshToken refreshToken);

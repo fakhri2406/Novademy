@@ -45,3 +45,10 @@ ScaffoldingReadMe.txt
 # Development App Settings
 # ====================
 appsettings.Development.json
+
+# ====================
+# Frontend Dependencies
+# ====================
+node_modules/
+package-lock.json
+package.json

@@ -33,12 +33,5 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         
         RuleFor(x => x.RoleId)
             .InclusiveBetween(1, 3).WithMessage("RoleId must be between 1 and 3 (1=Admin, 2=Teacher, 3=Student).");
-        
-        RuleFor(x => x.Group)
-            .InclusiveBetween(1, 4).WithMessage("Group must be between 1 and 4.");
-        
-        RuleFor(x => x.ProfilePictureUrl)
-            .Matches(@"^https?://[^\s/$.?#].[^\s]*$").WithMessage("Invalid URL format.")
-            .When(x => !string.IsNullOrEmpty(x.ProfilePictureUrl));
     }
 }

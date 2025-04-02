@@ -1,8 +1,11 @@
+using CloudinaryDotNet;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Novademy.Application.Data;
+using Novademy.Application.Cloudinary;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Repositories.Concrete;
 using Novademy.Application.Tokens;
@@ -41,6 +44,17 @@ public static class DependencyInjection
         #region Tokens
         
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
+        
+        #endregion
+        
+        #region Cloudinary
+        
+        services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
+        services.AddSingleton<CloudinaryDotNet.Cloudinary>(sp =>
+        {
+            var config = sp.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+            return new CloudinaryDotNet.Cloudinary(new Account(config.CloudName, config.ApiKey, config.ApiSecret));
+        });
         
         #endregion
         

@@ -1,3 +1,6 @@
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Novademy.Application.Data;
 using Novademy.Application.Helpers;
@@ -9,31 +12,57 @@ namespace Novademy.Application.Repositories.Concrete;
 public class UserRepository : IUserRepository
 {
     private readonly AppDbContext _context;
+    private readonly CloudinaryDotNet.Cloudinary _cloudinary;
     
-    public UserRepository(AppDbContext context)
+    public UserRepository(AppDbContext context, CloudinaryDotNet.Cloudinary cloudinary)
     {
         _context = context;
+        _cloudinary = cloudinary;
     }
     
     #region Register
     
-    public async Task<User> RegisterUserAsync(User user)
+    public async Task<User> RegisterUserAsync(User user, IFormFile profilePicture)
     {
         user.Id = Guid.NewGuid();
-        
         user.Salt = Guid.NewGuid().ToString();
         user.Password = Hasher.HashPassword($"{user.Password}{user.Salt}");
+        
+        if (profilePicture is not null)
+        {
+            var uploadResult = await UploadProfilePictureAsync(profilePicture);
+            user.ProfilePictureUrl = uploadResult.SecureUrl.ToString();
+        }
         
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
         
         return user;
     }
+
+    private async Task<ImageUploadResult> UploadProfilePictureAsync(IFormFile file)
+    {
+        using var stream = file.OpenReadStream();
+        var uploadParams = new ImageUploadParams
+        {
+            File = new FileDescription(file.FileName, stream),
+            Folder = "user_profiles",
+            PublicId = Guid.NewGuid().ToString()
+        };
+        
+        var result = await _cloudinary.UploadAsync(uploadParams);
+        if (result.Error != null)
+        {
+            throw new Exception(result.Error.Message);
+        }
+        
+        return result;
+    }
     
     #endregion
     
     #region Login
-    
+
     public async Task<User> LoginUserAsync(string username, string password)
     {
         var loggedInUser = await _context.Users

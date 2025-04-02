@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Novademy.Contracts.Enums;
 
 namespace Novademy.Contracts.Requests.Auth;
@@ -13,5 +14,5 @@ public class RegisterRequest
     public required int RoleId { get; init; }
     public int Group { get; init; }
     public SectorType Sector { get; init; }
-    public string? ProfilePictureUrl { get; init; }
+    public IFormFile? ProfilePicture { get; init; }
 }

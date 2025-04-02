@@ -25,7 +25,7 @@ namespace Novademy.Application.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "ProfilePictureUrl",
+                name: "ProfilePicture",
                 table: "Users",
                 type: "text",
                 nullable: true);
@@ -137,7 +137,7 @@ namespace Novademy.Application.Migrations
                 table: "Users");
 
             migrationBuilder.DropColumn(
-                name: "ProfilePictureUrl",
+                name: "ProfilePicture",
                 table: "Users");
 
             migrationBuilder.DropColumn(

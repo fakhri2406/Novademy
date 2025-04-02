@@ -307,7 +307,7 @@ namespace Novademy.Application.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ProfilePictureUrl")
+                    b.Property<string>("ProfilePicture")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("RegisteredAt")
