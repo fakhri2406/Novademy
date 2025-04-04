@@ -20,7 +20,7 @@ public class PackageRepository : IPackageRepository
     
     #region Create
 
-    public async Task<Package> CreatePackageAsync(Package package, IFormFile image)
+    public async Task<Package> CreatePackageAsync(Package package, IFormFile? image)
     {
         package.Id = Guid.NewGuid();
         
@@ -62,10 +62,17 @@ public class PackageRepository : IPackageRepository
     
     #region Update
     
-    public async Task<Package?> UpdatePackageAsync(Package package)
+    public async Task<Package?> UpdatePackageAsync(Package package, IFormFile? image)
     {
+        if (image is not null)
+        {
+            var uploadResult = await _mediaUpload.UploadImageAsync(image, "packages");
+            package.ImageUrl = uploadResult.SecureUrl.ToString();
+        }
+        
         _context.Packages.Update(package);
         await _context.SaveChangesAsync();
+        
         return package;
     }
     

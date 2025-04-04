@@ -20,7 +20,7 @@ public class CourseRepository : ICourseRepository
     
     #region Create
     
-    public async Task<Course> CreateCourseAsync(Course course, IFormFile image) 
+    public async Task<Course> CreateCourseAsync(Course course, IFormFile? image) 
     {
         course.Id = Guid.NewGuid();
         
@@ -58,10 +58,17 @@ public class CourseRepository : ICourseRepository
     
     #region Update
     
-    public async Task<Course?> UpdateCourseAsync(Course course)
+    public async Task<Course?> UpdateCourseAsync(Course course, IFormFile? image)
     {
+        if (image is not null)
+        {
+            var uploadResult = await _mediaUpload.UploadImageAsync(image, "courses");
+            course.ImageUrl = uploadResult.SecureUrl.ToString();
+        }
+        
         _context.Courses.Update(course);
         await _context.SaveChangesAsync();
+        
         return course;
     }
     

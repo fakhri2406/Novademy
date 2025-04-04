@@ -157,7 +157,7 @@ public class LessonController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Admin,Teacher")]
-    public async Task<IActionResult> UpdateLesson([FromRoute] Guid id, [FromBody] UpdateLessonRequest request)
+    public async Task<IActionResult> UpdateLesson([FromRoute] Guid id, [FromForm] UpdateLessonRequest request)
     {
         var validationResult = await _updateValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
@@ -175,7 +175,7 @@ public class LessonController : ControllerBase
             lessonToUpdate.Transcript = request.Transcript;
             lessonToUpdate.UpdatedAt = DateTime.UtcNow;
             
-            var updatedLesson = await _repo.UpdateLessonAsync(lessonToUpdate);
+            var updatedLesson = await _repo.UpdateLessonAsync(lessonToUpdate, request.Video, request.Image ?? null);
             
             var response = updatedLesson!.MapToLessonResponse();
             return Ok(response);

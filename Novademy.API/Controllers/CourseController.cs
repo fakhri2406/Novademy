@@ -146,7 +146,7 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> UpdateCourse([FromRoute] Guid id, [FromBody] UpdateCourseRequest request)
+    public async Task<IActionResult> UpdateCourse([FromRoute] Guid id, [FromForm] UpdateCourseRequest request)
     {
         var validationResult = await _updateValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
@@ -163,7 +163,7 @@ public class CourseController : ControllerBase
             courseToUpdate.Subject = request.Subject;
             courseToUpdate.UpdatedAt = DateTime.UtcNow;
             
-            var updatedCourse = await _repo.UpdateCourseAsync(courseToUpdate);
+            var updatedCourse = await _repo.UpdateCourseAsync(courseToUpdate, request.Image ?? null);
             
             var response = updatedCourse!.MapToCourseResponse();
             return Ok(response);

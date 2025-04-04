@@ -8,4 +8,5 @@ public class UpdateCourseRequest
     public required string Title { get; init; }
     public required string Description { get; init; }
     public required SubjectType Subject { get; init; }
+    public IFormFile? Image { get; init; }
 }

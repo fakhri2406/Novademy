@@ -145,7 +145,7 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> UpdatePackage([FromRoute] Guid id, [FromBody] UpdatePackageRequest request)
+    public async Task<IActionResult> UpdatePackage([FromRoute] Guid id, [FromForm] UpdatePackageRequest request)
     {
         var validationResult = await _updateValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
@@ -172,7 +172,7 @@ public class PackageController : ControllerBase
                 }
             }
             
-            var updatedPackage = await _repo.UpdatePackageAsync(packageToUpdate);
+            var updatedPackage = await _repo.UpdatePackageAsync(packageToUpdate, request.Image ?? null);
             
             var response = updatedPackage!.MapToPackageResponse();
             return Ok(response);

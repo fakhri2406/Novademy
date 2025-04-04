@@ -20,15 +20,15 @@ public class LessonRepository : ILessonRepository
     
     #region Create
     
-    public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile video, IFormFile image)
+    public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
         lesson.Id = Guid.NewGuid();
-
-        if (video is not null && image is not null)
+        
+        var videoUploadResult = await _mediaUpload.UploadVideoAsync(video, "lesson_videos");
+        lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
+        
+        if (image is not null)
         {
-            var videoUploadResult = await _mediaUpload.UploadVideoAsync(video, "lesson_videos");
-            lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
-            
             var imageUploadResult = await _mediaUpload.UploadImageAsync(image, "lesson_images");
             lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
         }
@@ -67,10 +67,20 @@ public class LessonRepository : ILessonRepository
     
     #region Update
     
-    public async Task<Lesson?> UpdateLessonAsync(Lesson lesson)
+    public async Task<Lesson?> UpdateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
+        var videoUploadResult = await _mediaUpload.UploadVideoAsync(video, "lesson_videos");
+        lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
+        
+        if (image is not null)
+        {
+            var imageUploadResult = await _mediaUpload.UploadImageAsync(image, "lesson_images");
+            lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
+        }
+        
         _context.Lessons.Update(lesson);
         await _context.SaveChangesAsync();
+        
         return lesson;
     }
     
