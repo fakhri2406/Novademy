@@ -15,5 +15,8 @@ public class UpdateLessonRequestValidator  : AbstractValidator<UpdateLessonReque
         
         RuleFor(x => x.Order)
             .GreaterThan(0).WithMessage("Order must be a positive number.");
+        
+        RuleFor(x => x.Transcript)
+            .NotEmpty().WithMessage("Lesson transcript is required.");
     }
 }

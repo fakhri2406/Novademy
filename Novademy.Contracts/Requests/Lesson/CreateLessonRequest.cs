@@ -8,7 +8,7 @@ public class CreateLessonRequest
     public required string Description { get; init; }
     public required IFormFile Video { get; init; }
     public required int Order { get; init; }
-    public string? Transcript { get; init; }
+    public required string Transcript { get; init; }
     public IFormFile? Image { get; init; }
     public required Guid CourseId { get; init; }
 }
