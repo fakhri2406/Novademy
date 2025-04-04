@@ -1,9 +1,11 @@
+using System.Text;
 using CloudinaryDotNet;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Novademy.Application.Data;
 using Novademy.Application.Cloudinary;
 using Novademy.Application.Repositories.Abstract;
@@ -44,6 +46,18 @@ public static class DependencyInjection
         #region Tokens
         
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
+        
+        var jwtSection = configuration.GetSection("Jwt");
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]!));
+        const int accessTokenLifeTime = 30;
+        
+        services.Configure<JwtOptions>(options =>
+        {
+            options.Issuer = jwtSection["Issuer"]!;
+            options.Audience = jwtSection["Audience"]!;
+            options.AccessValidFor = TimeSpan.FromMinutes(accessTokenLifeTime);
+            options.SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        });
         
         #endregion
         

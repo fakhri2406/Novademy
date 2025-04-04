@@ -49,22 +49,6 @@ builder.Services.AddSwaggerGen(options =>
     #endregion
 });
 
-#region Jwt Options
-
-var jwtSection = builder.Configuration.GetSection("Jwt");
-var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]!));
-const int accessTokenLifeTime = 15;
-
-builder.Services.Configure<JwtOptions>(options =>
-{
-    options.Issuer = jwtSection["Issuer"]!;
-    options.Audience = jwtSection["Audience"]!;
-    options.AccessValidFor = TimeSpan.FromMinutes(accessTokenLifeTime);
-    options.SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-});
-
-#endregion
-
 #region Authentication Scheme
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
