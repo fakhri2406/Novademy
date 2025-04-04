@@ -1,7 +1,7 @@
 using FluentValidation;
 using Novademy.Contracts.Requests.Package;
 
-namespace Novademy.Contracts.Validators.Package;
+namespace Novademy.Application.Validators.Package;
 
 public class UpdatePackageRequestValidator  : AbstractValidator<UpdatePackageRequest>
 {

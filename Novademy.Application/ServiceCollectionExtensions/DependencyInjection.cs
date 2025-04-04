@@ -11,7 +11,7 @@ using Novademy.Application.Cloudinary;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Repositories.Concrete;
 using Novademy.Application.Tokens;
-using Novademy.Contracts.Validators.Auth;
+using Novademy.Application.Validators.Auth;
 
 namespace Novademy.Application.ServiceCollectionExtensions;
 

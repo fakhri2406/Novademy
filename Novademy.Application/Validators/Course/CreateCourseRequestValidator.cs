@@ -1,11 +1,11 @@
 using FluentValidation;
 using Novademy.Contracts.Requests.Course;
 
-namespace Novademy.Contracts.Validators.Course;
+namespace Novademy.Application.Validators.Course;
 
-public class UpdateCourseRequestValidator : AbstractValidator<UpdateCourseRequest>
+public class CreateCourseRequestValidator : AbstractValidator<CreateCourseRequest>
 {
-    public UpdateCourseRequestValidator()
+    public CreateCourseRequestValidator()
     {
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.");

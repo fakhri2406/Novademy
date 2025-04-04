@@ -1,7 +1,7 @@
 using FluentValidation;
 using Novademy.Contracts.Requests.Lesson;
 
-namespace Novademy.Contracts.Validators.Lesson;
+namespace Novademy.Application.Validators.Lesson;
 
 public class CreateLessonRequestValidator : AbstractValidator<CreateLessonRequest>
 {

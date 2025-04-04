@@ -1,7 +1,7 @@
 using FluentValidation;
 using Novademy.Contracts.Requests.Auth;
 
-namespace Novademy.Contracts.Validators.Auth;
+namespace Novademy.Application.Validators.Auth;
 
 public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {

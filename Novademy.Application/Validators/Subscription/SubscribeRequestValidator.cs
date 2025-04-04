@@ -1,7 +1,7 @@
 using FluentValidation;
 using Novademy.Contracts.Requests.Subscription;
 
-namespace Novademy.Contracts.Validators.Subscription;
+namespace Novademy.Application.Validators.Subscription;
 
 public class SubscribeRequestValidator : AbstractValidator<SubscriptionRequest>
 {
