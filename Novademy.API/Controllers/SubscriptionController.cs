@@ -1,13 +1,13 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Novademy.API.EndPoints;
 using Novademy.API.Mapping;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Contracts.Requests.Subscription;
 
 namespace Novademy.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 [Authorize]
 public class SubscriptionController : ControllerBase
@@ -30,7 +30,8 @@ public class SubscriptionController : ControllerBase
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    [HttpGet("active/{userId}")]
+    [HttpGet]
+    [Route(ApiEndPoints.Subscription.GetActiveSubscriptions)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -59,6 +60,7 @@ public class SubscriptionController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
+    [Route(ApiEndPoints.Subscription.Subscribe)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

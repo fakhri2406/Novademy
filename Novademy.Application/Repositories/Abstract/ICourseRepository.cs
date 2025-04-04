@@ -1,4 +1,3 @@
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Novademy.Application.Models;
 

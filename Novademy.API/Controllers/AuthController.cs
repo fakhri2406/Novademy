@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Novademy.API.EndPoints;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Tokens;
@@ -9,7 +10,6 @@ using Novademy.API.Mapping;
 
 namespace Novademy.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -37,7 +37,8 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("register")]
+    [HttpPost]
+    [Route(ApiEndPoints.Auth.Register)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromForm] RegisterRequest request)
@@ -51,7 +52,7 @@ public class AuthController : ControllerBase
         var user = request.MapToUser();
         try
         {
-            var registeredUser = await _repo.RegisterUserAsync(user, request.ProfilePicture!);
+            var registeredUser = await _repo.RegisterUserAsync(user, request.ProfilePicture ?? null);
             return CreatedAtAction(nameof(Register), new { id = registeredUser.Id },
                 $"User with ID {registeredUser.Id} registered successfully.");
         }
@@ -70,7 +71,8 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("login")]
+    [HttpPost]
+    [Route(ApiEndPoints.Auth.Login)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

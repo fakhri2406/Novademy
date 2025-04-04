@@ -1,13 +1,13 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Novademy.API.EndPoints;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Contracts.Requests.Quiz;
 using Novademy.API.Mapping;
 
 namespace Novademy.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 [Authorize]
 public class QuizController : ControllerBase
@@ -45,7 +45,8 @@ public class QuizController : ControllerBase
     /// </summary>
     /// <param name="lessonId"></param>
     /// <returns></returns>
-    [HttpGet("lesson/{lessonId}")]
+    [HttpGet]
+    [Route(ApiEndPoints.Quiz.GetQuizzes)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -60,7 +61,8 @@ public class QuizController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet]
+    [Route(ApiEndPoints.Quiz.GetQuiz)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -92,6 +94,7 @@ public class QuizController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
+    [Route(ApiEndPoints.Quiz.CreateQuiz)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -132,7 +135,8 @@ public class QuizController : ControllerBase
     /// <param name="id"></param>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPut("{id}")]
+    [HttpPut]
+    [Route(ApiEndPoints.Quiz.UpdateQuiz)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -175,7 +179,8 @@ public class QuizController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpDelete("{id}")]
+    [HttpDelete]
+    [Route(ApiEndPoints.Quiz.DeleteQuiz)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -207,7 +212,8 @@ public class QuizController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("question/{id}")]
+    [HttpGet]
+    [Route(ApiEndPoints.Quiz.GetQuestion)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -238,7 +244,8 @@ public class QuizController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("question")]
+    [HttpPost]
+    [Route(ApiEndPoints.Quiz.CreateQuestion)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

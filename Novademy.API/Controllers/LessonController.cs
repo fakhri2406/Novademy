@@ -1,13 +1,13 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Novademy.API.EndPoints;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Contracts.Requests.Lesson;
 using Novademy.API.Mapping;
 
 namespace Novademy.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 [Authorize]
 public class LessonController : ControllerBase
@@ -36,7 +36,8 @@ public class LessonController : ControllerBase
     /// </summary>
     /// <param name="courseId"></param>
     /// <returns></returns>
-    [HttpGet("course/{courseId}")]
+    [HttpGet]
+    [Route(ApiEndPoints.Lesson.GetLessons)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -64,7 +65,8 @@ public class LessonController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet]
+    [Route(ApiEndPoints.Lesson.GetLesson)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -112,6 +114,7 @@ public class LessonController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
+    [Route(ApiEndPoints.Lesson.CreateLesson)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -150,7 +153,8 @@ public class LessonController : ControllerBase
     /// <param name="id"></param>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPut("{id}")]
+    [HttpPut]
+    [Route(ApiEndPoints.Lesson.UpdateLesson)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -199,7 +203,8 @@ public class LessonController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpDelete("{id}")]
+    [HttpDelete]
+    [Route(ApiEndPoints.Lesson.DeleteLesson)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

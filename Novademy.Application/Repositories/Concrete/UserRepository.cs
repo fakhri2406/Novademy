@@ -21,7 +21,7 @@ public class UserRepository : IUserRepository
     
     #region Register
     
-    public async Task<User> RegisterUserAsync(User user, IFormFile profilePicture)
+    public async Task<User> RegisterUserAsync(User user, IFormFile? profilePicture)
     {
         user.Id = Guid.NewGuid();
         user.Salt = Guid.NewGuid().ToString();

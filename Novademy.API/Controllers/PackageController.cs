@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Novademy.API.EndPoints;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Contracts.Requests.Package;
@@ -8,7 +9,6 @@ using Novademy.API.Mapping;
 
 namespace Novademy.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 [Authorize(Roles = "Admin")]
 public class PackageController : ControllerBase
@@ -37,6 +37,7 @@ public class PackageController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
+    [Route(ApiEndPoints.Package.GetPackages)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -53,7 +54,8 @@ public class PackageController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet]
+    [Route(ApiEndPoints.Package.GetPackage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -87,6 +89,7 @@ public class PackageController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
+    [Route(ApiEndPoints.Package.CreatePackage)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -139,7 +142,8 @@ public class PackageController : ControllerBase
     /// <param name="id"></param>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPut("{id}")]
+    [HttpPut]
+    [Route(ApiEndPoints.Package.UpdatePackage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -196,7 +200,8 @@ public class PackageController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpDelete("{id}")]
+    [HttpDelete]
+    [Route(ApiEndPoints.Package.DeletePackage)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
