@@ -21,14 +21,17 @@ public class LessonRepository : ILessonRepository
     
     #region Create
     
-    public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile image)
+    public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile video, IFormFile image)
     {
         lesson.Id = Guid.NewGuid();
-        
-        if (image is not null)
+
+        if (video is not null && image is not null)
         {
-            var uploadResult = await UploadImageAsync(image);
-            lesson.ImageUrl = uploadResult.SecureUrl.ToString();
+            var videoUploadResult = await UploadVideoAsync(video);
+            lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
+            
+            var imageUploadResult = await UploadImageAsync(image);
+            lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
         }
         
         _context.Lessons.Add(lesson);
@@ -37,13 +40,32 @@ public class LessonRepository : ILessonRepository
         return lesson;
     }
     
+    public async Task<VideoUploadResult> UploadVideoAsync(IFormFile file)
+    {
+        using var stream = file.OpenReadStream();
+        var uploadParams = new VideoUploadParams
+        {
+            File = new FileDescription(file.FileName, stream),
+            Folder = "lessons_videos",
+            PublicId = Guid.NewGuid().ToString()
+        };
+        
+        var result = await _cloudinary.UploadAsync(uploadParams);
+        if (result.Error != null)
+        {
+            throw new Exception(result.Error.Message);
+        }
+        
+        return result;
+    }
+    
     public async Task<ImageUploadResult> UploadImageAsync(IFormFile file)
     {
         using var stream = file.OpenReadStream();
         var uploadParams = new ImageUploadParams
         {
             File = new FileDescription(file.FileName, stream),
-            Folder = "lessons",
+            Folder = "lessons_images",
             PublicId = Guid.NewGuid().ToString()
         };
         

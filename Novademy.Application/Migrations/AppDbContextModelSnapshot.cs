@@ -126,7 +126,7 @@ namespace Novademy.Application.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("VideoUrl")
+                    b.Property<string>("Video")
                         .IsRequired()
                         .HasColumnType("text");
 

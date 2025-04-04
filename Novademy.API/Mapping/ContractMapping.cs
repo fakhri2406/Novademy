@@ -80,7 +80,6 @@ public static class ContractMapping
         {
             Title = request.Title,
             Description = request.Description,
-            VideoUrl = request.VideoUrl,
             Order = request.Order,
             Transcript = request.Transcript,
             CourseId = request.CourseId,
