@@ -1,7 +1,6 @@
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Novademy.Application.Cloudinary;
 using Novademy.Application.Data;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
@@ -11,12 +10,12 @@ namespace Novademy.Application.Repositories.Concrete;
 public class LessonRepository : ILessonRepository
 {
     private readonly AppDbContext _context;
-    private readonly CloudinaryDotNet.Cloudinary _cloudinary;
+    private readonly IMediaUpload _mediaUpload;
     
-    public LessonRepository(AppDbContext context, CloudinaryDotNet.Cloudinary cloudinary)
+    public LessonRepository(AppDbContext context, IMediaUpload mediaUpload)
     {
         _context = context;
-        _cloudinary = cloudinary;
+        _mediaUpload = mediaUpload;
     }
     
     #region Create
@@ -27,10 +26,10 @@ public class LessonRepository : ILessonRepository
 
         if (video is not null && image is not null)
         {
-            var videoUploadResult = await UploadVideoAsync(video);
+            var videoUploadResult = await _mediaUpload.UploadVideoAsync(video, "lesson_videos");
             lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
             
-            var imageUploadResult = await UploadImageAsync(image);
+            var imageUploadResult = await _mediaUpload.UploadImageAsync(image, "lesson_images");
             lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
         }
         
@@ -38,44 +37,6 @@ public class LessonRepository : ILessonRepository
         await _context.SaveChangesAsync();
         
         return lesson;
-    }
-    
-    public async Task<VideoUploadResult> UploadVideoAsync(IFormFile file)
-    {
-        using var stream = file.OpenReadStream();
-        var uploadParams = new VideoUploadParams
-        {
-            File = new FileDescription(file.FileName, stream),
-            Folder = "lessons_videos",
-            PublicId = Guid.NewGuid().ToString()
-        };
-        
-        var result = await _cloudinary.UploadAsync(uploadParams);
-        if (result.Error != null)
-        {
-            throw new Exception(result.Error.Message);
-        }
-        
-        return result;
-    }
-    
-    public async Task<ImageUploadResult> UploadImageAsync(IFormFile file)
-    {
-        using var stream = file.OpenReadStream();
-        var uploadParams = new ImageUploadParams
-        {
-            File = new FileDescription(file.FileName, stream),
-            Folder = "lessons_images",
-            PublicId = Guid.NewGuid().ToString()
-        };
-        
-        var result = await _cloudinary.UploadAsync(uploadParams);
-        if (result.Error != null)
-        {
-            throw new Exception(result.Error.Message);
-        }
-        
-        return result;
     }
     
     #endregion

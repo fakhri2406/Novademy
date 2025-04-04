@@ -64,11 +64,14 @@ public static class DependencyInjection
         #region Cloudinary
         
         services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
+        
         services.AddSingleton<CloudinaryDotNet.Cloudinary>(sp =>
         {
             var config = sp.GetRequiredService<IOptions<CloudinarySettings>>().Value;
             return new CloudinaryDotNet.Cloudinary(new Account(config.CloudName, config.ApiKey, config.ApiSecret));
         });
+        
+        services.AddSingleton<IMediaUpload, MediaUpload>();
         
         #endregion
         

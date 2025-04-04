@@ -1,7 +1,6 @@
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Novademy.Application.Cloudinary;
 using Novademy.Application.Data;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
@@ -11,12 +10,12 @@ namespace Novademy.Application.Repositories.Concrete;
 public class CourseRepository : ICourseRepository
 {
     private readonly AppDbContext _context;
-    private readonly CloudinaryDotNet.Cloudinary _cloudinary;
+    private readonly IMediaUpload _mediaUpload;
     
-    public CourseRepository(AppDbContext context, CloudinaryDotNet.Cloudinary cloudinary)
+    public CourseRepository(AppDbContext context, IMediaUpload mediaUpload)
     {
         _context = context;
-        _cloudinary = cloudinary;
+        _mediaUpload = mediaUpload;
     }
     
     #region Create
@@ -27,7 +26,7 @@ public class CourseRepository : ICourseRepository
         
         if (image is not null)
         {
-            var uploadResult = await UploadImageAsync(image);
+            var uploadResult = await _mediaUpload.UploadImageAsync(image, "courses");
             course.ImageUrl = uploadResult.SecureUrl.ToString();
         }
         
@@ -35,25 +34,6 @@ public class CourseRepository : ICourseRepository
         await _context.SaveChangesAsync();
         
         return course;
-    }
-    
-    public async Task<ImageUploadResult> UploadImageAsync(IFormFile file)
-    {
-        using var stream = file.OpenReadStream();
-        var uploadParams = new ImageUploadParams
-        {
-            File = new FileDescription(file.FileName, stream),
-            Folder = "courses",
-            PublicId = Guid.NewGuid().ToString()
-        };
-        
-        var result = await _cloudinary.UploadAsync(uploadParams);
-        if (result.Error != null)
-        {
-            throw new Exception(result.Error.Message);
-        }
-        
-        return result;
     }
     
     #endregion
