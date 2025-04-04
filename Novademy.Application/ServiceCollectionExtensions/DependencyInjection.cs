@@ -17,17 +17,8 @@ namespace Novademy.Application.ServiceCollectionExtensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        #region DbContext
-        
-        services.AddDbContext<AppDbContext>(options => 
-            options.UseNpgsql(configuration.GetConnectionString("Default")));
-        
-        #endregion
-        
-        #region Repositories
-        
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
@@ -35,16 +26,19 @@ public static class DependencyInjection
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IQuizRepository, QuizRepository>();
         
-        #endregion
+        return services;
+    }
+    
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<AppDbContext>(options => 
+            options.UseNpgsql(configuration.GetConnectionString("Default")));
         
-        #region Validators
-        
-        services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
-        
-        #endregion
-        
-        #region Tokens
-        
+        return services;
+    }
+    
+    public static IServiceCollection AddTokens(this IServiceCollection services, IConfiguration configuration)
+    {
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
         
         var jwtSection = configuration.GetSection("Jwt");
@@ -58,6 +52,15 @@ public static class DependencyInjection
             options.AccessValidFor = TimeSpan.FromMinutes(accessTokenLifeTime);
             options.SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         });
+        
+        return services;
+    }
+    
+    public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
+    {
+        #region Validators
+        
+        services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
         
         #endregion
         

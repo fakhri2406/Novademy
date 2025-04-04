@@ -4,13 +4,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Novademy.Application.ServiceCollectionExtensions;
-using Novademy.Application.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddRepositories();
+builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddTokens(builder.Configuration);
+builder.Services.AddConfigurations(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
