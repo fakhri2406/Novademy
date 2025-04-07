@@ -18,10 +18,6 @@ public class SubscriptionRepository : ISubscriptionRepository
     
     public async Task<Subscription> CreateSubscriptionAsync(Subscription subscription)
     {
-        subscription.Id = Guid.NewGuid();
-        subscription.StartDate = DateTime.UtcNow;
-        subscription.EndDate = DateTime.UtcNow.AddYears(1);
-        
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync();
         

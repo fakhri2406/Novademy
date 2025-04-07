@@ -22,8 +22,6 @@ public class LessonRepository : ILessonRepository
     
     public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
-        lesson.Id = Guid.NewGuid();
-        
         var videoUploadResult = await _mediaUpload.UploadVideoAsync(video, "lesson_videos");
         lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
         

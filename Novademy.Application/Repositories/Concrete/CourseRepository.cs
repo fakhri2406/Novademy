@@ -22,8 +22,6 @@ public class CourseRepository : ICourseRepository
     
     public async Task<Course> CreateCourseAsync(Course course, IFormFile? image) 
     {
-        course.Id = Guid.NewGuid();
-        
         if (image is not null)
         {
             var uploadResult = await _mediaUpload.UploadImageAsync(image, "courses");

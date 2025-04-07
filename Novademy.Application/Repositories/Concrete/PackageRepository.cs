@@ -22,8 +22,6 @@ public class PackageRepository : IPackageRepository
 
     public async Task<Package> CreatePackageAsync(Package package, IFormFile? image)
     {
-        package.Id = Guid.NewGuid();
-        
         if (image is not null)
         {
             var uploadResult = await _mediaUpload.UploadImageAsync(image, "packages");

@@ -18,8 +18,6 @@ public class QuizRepository : IQuizRepository
     
     public async Task<Quiz> CreateQuizAsync(Quiz quiz)
     {
-        quiz.Id = Guid.NewGuid();
-        
         _context.Quizzes.Add(quiz);
         await _context.SaveChangesAsync();
         

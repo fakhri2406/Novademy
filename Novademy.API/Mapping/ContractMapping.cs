@@ -27,12 +27,14 @@ public static class ContractMapping
         
         return new User
         {
+            Id = Guid.NewGuid(),
             Username = request.Username,
+            Password = request.Password,
+            Salt = Guid.NewGuid().ToString(),
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
             PhoneNumber = formattedPhoneNumber,
-            Password = request.Password,
             RoleId = request.RoleId,
             Group = request.Group,
             Sector = request.Sector,
@@ -48,6 +50,7 @@ public static class ContractMapping
     {
         return new Course()
         {
+            Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
             Subject = request.Subject,
@@ -78,6 +81,7 @@ public static class ContractMapping
     {
         return new Lesson()
         {
+            Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
             Order = request.Order,
@@ -113,6 +117,7 @@ public static class ContractMapping
     {
         return new Package()
         {
+            Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
             Price = request.Price,
@@ -144,8 +149,11 @@ public static class ContractMapping
     {
         return new Subscription()
         {
+            Id = Guid.NewGuid(),
             UserId = request.UserId,
-            PackageId = request.PackageId
+            PackageId = request.PackageId,
+            StartDate = DateTime.UtcNow,
+            EndDate = DateTime.UtcNow.AddYears(1)
         };
     }
     
@@ -170,6 +178,7 @@ public static class ContractMapping
     {
         return new Quiz
         {
+            Id = Guid.NewGuid(),
             Title = request.Title,
             LessonId = request.LessonId
         };
@@ -179,6 +188,7 @@ public static class ContractMapping
     {
         return new Question
         {
+            Id = Guid.NewGuid(),
             Text = request.Text,
             QuizId = request.QuizId
         };
@@ -188,6 +198,7 @@ public static class ContractMapping
     {
         return new Answer
         {
+            Id = Guid.NewGuid(),
             Text = request.Text,
             IsCorrect = request.IsCorrect,
             QuestionId = questionId

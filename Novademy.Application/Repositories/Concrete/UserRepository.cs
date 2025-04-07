@@ -38,8 +38,6 @@ public class UserRepository : IUserRepository
             throw new ArgumentException("Phone number already exists.");
         }
         
-        user.Id = Guid.NewGuid();
-        user.Salt = Guid.NewGuid().ToString();
         user.Password = Hasher.HashPassword($"{user.Password}{user.Salt}");
         
         if (profilePicture is not null)

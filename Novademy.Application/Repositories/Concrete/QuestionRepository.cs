@@ -18,8 +18,6 @@ public class QuestionRepository : IQuestionRepository
     
     public async Task<Question> CreateQuestionAsync(Question question)
     {
-        question.Id = Guid.NewGuid();
-        
         _context.Questions.Add(question);
         await _context.SaveChangesAsync();
         

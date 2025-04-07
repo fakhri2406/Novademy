@@ -17,8 +17,6 @@ public class AnswerRepository : IAnswerRepository
     
     public async Task<Answer> CreateAnswerAsync(Answer answer)
     {
-        answer.Id = Guid.NewGuid();
-        
         _context.Answers.Add(answer);
         await _context.SaveChangesAsync();
         
