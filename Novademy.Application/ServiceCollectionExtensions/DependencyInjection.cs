@@ -6,8 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Novademy.Application.Data;
+using Novademy.Application.Data.EFCore;
 using Novademy.Application.Cloudinary;
+using Novademy.Application.Data.Dapper;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Repositories.Concrete;
 using Novademy.Application.Tokens;
@@ -38,6 +39,10 @@ public static class DependencyInjection
                     maxRetryCount: 5,
                     maxRetryDelay: TimeSpan.FromSeconds(10),
                     errorNumbersToAdd: null)));
+        
+        services.AddScoped<IDbConnectionFactory, MsSqlConnectionFactory>(provider =>
+            new MsSqlConnectionFactory(
+                configuration.GetConnectionString("Azure")!));
         
         return services;
     }

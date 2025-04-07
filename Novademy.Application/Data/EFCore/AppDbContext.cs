@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Novademy.Application.Models;
 
-namespace Novademy.Application.Data;
+namespace Novademy.Application.Data.EFCore;
 
 public class AppDbContext : DbContext
 {

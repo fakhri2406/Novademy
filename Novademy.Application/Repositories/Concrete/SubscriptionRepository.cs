@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Novademy.Application.Data;
+using Novademy.Application.Data.EFCore;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
