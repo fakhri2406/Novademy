@@ -1,6 +1,7 @@
 using System.Text;
 using CloudinaryDotNet;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,8 @@ public static class DependencyInjection
     
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        #region EF Core
+        
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("Azure"),
@@ -40,9 +43,15 @@ public static class DependencyInjection
                     maxRetryDelay: TimeSpan.FromSeconds(10),
                     errorNumbersToAdd: null)));
         
+        #endregion
+        
+        #region Dapper
+        
         services.AddScoped<IDbConnectionFactory, MsSqlConnectionFactory>(provider =>
             new MsSqlConnectionFactory(
                 configuration.GetConnectionString("Azure")!));
+        
+        #endregion
         
         return services;
     }
@@ -50,6 +59,8 @@ public static class DependencyInjection
     public static IServiceCollection AddTokens(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
+        
+        #region JWT Options
         
         var jwtSection = configuration.GetSection("Jwt");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]!));
@@ -61,6 +72,27 @@ public static class DependencyInjection
             options.AccessValidFor = TimeSpan.FromMinutes(30);
             options.SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         });
+        
+        #endregion
+        
+        #region Authentication Scheme
+        
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+                };
+            });
+        
+        #endregion
         
         return services;
     }
