@@ -53,13 +53,12 @@ public static class DependencyInjection
         
         var jwtSection = configuration.GetSection("Jwt");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]!));
-        const int accessTokenLifeTime = 30;
         
         services.Configure<JwtOptions>(options =>
         {
             options.Issuer = jwtSection["Issuer"]!;
             options.Audience = jwtSection["Audience"]!;
-            options.AccessValidFor = TimeSpan.FromMinutes(accessTokenLifeTime);
+            options.AccessValidFor = TimeSpan.FromMinutes(30);
             options.SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         });
         
