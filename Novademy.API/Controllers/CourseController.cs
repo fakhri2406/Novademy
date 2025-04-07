@@ -111,11 +111,7 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateCourse([FromForm] CreateCourseRequest request)
     {
-        var validationResult = await _createValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _createValidator.ValidateAndThrowAsync(request);
         
         var course = request.MapToCourse();
         try
@@ -152,11 +148,7 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCourse([FromRoute] Guid id, [FromForm] UpdateCourseRequest request)
     {
-        var validationResult = await _updateValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _updateValidator.ValidateAndThrowAsync(request);
         
         try
         {

@@ -103,11 +103,7 @@ public class QuizController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateQuiz([FromBody] CreateQuizRequest request)
     {
-        var validationResult = await _createQuizValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _createQuizValidator.ValidateAndThrowAsync(request);
         
         var quiz = request.MapToQuiz();
         try
@@ -145,11 +141,7 @@ public class QuizController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> UpdateQuiz(Guid id, [FromBody] UpdateQuizRequest request)
     {
-        var validationResult = await _updateQuizValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _updateQuizValidator.ValidateAndThrowAsync(request);
         
         try
         {
@@ -254,11 +246,7 @@ public class QuizController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateQuestion([FromBody] CreateQuestionRequest request)
     {
-        var validationResult = await _createQuestionValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _createQuestionValidator.ValidateAndThrowAsync(request);
         
         if (!request.Answers.Any(a => a.IsCorrect))
         {
@@ -273,11 +261,7 @@ public class QuizController : ControllerBase
             
             foreach (var answerRequest in request.Answers)
             {
-                var answerValidationResult = await _createAnswerValidator.ValidateAsync(answerRequest);
-                if (!answerValidationResult.IsValid)
-                {
-                    return BadRequest(answerValidationResult.Errors);
-                }
+                await _createAnswerValidator.ValidateAndThrowAsync(answerRequest);
                 
                 var answer = answerRequest.MapToAnswer(createdQuestion.Id);
                 await _answerRepo.CreateAnswerAsync(answer);

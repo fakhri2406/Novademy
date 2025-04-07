@@ -122,11 +122,7 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateLesson([FromForm] CreateLessonRequest request)
     {
-        var validationResult = await _createValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _createValidator.ValidateAndThrowAsync(request);
         
         var lesson = request.MapToLesson();
         try
@@ -163,11 +159,7 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> UpdateLesson([FromRoute] Guid id, [FromForm] UpdateLessonRequest request)
     {
-        var validationResult = await _updateValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _updateValidator.ValidateAndThrowAsync(request);
         
         try
         {

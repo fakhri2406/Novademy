@@ -67,11 +67,7 @@ public class SubscriptionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Subscribe([FromBody] SubscriptionRequest request)
     {
-        var validationResult = await _subscribeValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _subscribeValidator.ValidateAndThrowAsync(request);
         
         var subscription = request.MapToSubscription();
         try

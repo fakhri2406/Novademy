@@ -44,11 +44,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromForm] RegisterRequest request)
     {
-        var validationResult = await _registerValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _registerValidator.ValidateAndThrowAsync(request);
         
         var user = request.MapToUser();
         try
@@ -83,11 +79,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login([FromForm] LoginRequest request)
     {
-        var validationResult = await _loginValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _loginValidator.ValidateAndThrowAsync(request);
         
         try
         {

@@ -97,11 +97,7 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreatePackage([FromForm] CreatePackageRequest request)
     {
-        var validationResult = await _createValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _createValidator.ValidateAndThrowAsync(request);
         
         var package = request.MapToPackage();
         try
@@ -151,11 +147,7 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> UpdatePackage([FromRoute] Guid id, [FromForm] UpdatePackageRequest request)
     {
-        var validationResult = await _updateValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        await _updateValidator.ValidateAndThrowAsync(request);
         
         try
         {
