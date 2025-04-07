@@ -23,6 +23,21 @@ public class UserRepository : IUserRepository
     
     public async Task<User> RegisterUserAsync(User user, IFormFile? profilePicture)
     {
+        if (await _context.Users.AnyAsync(u => u.Username == user.Username))
+        {
+            throw new ArgumentException("Username already exists.");
+        }
+        
+        if (await _context.Users.AnyAsync(u => u.Email == user.Email))
+        {
+            throw new ArgumentException("Email already exists.");
+        }
+        
+        if (await _context.Users.AnyAsync(u => u.PhoneNumber == user.PhoneNumber))
+        {
+            throw new ArgumentException("Phone number already exists.");
+        }
+        
         user.Id = Guid.NewGuid();
         user.Salt = Guid.NewGuid().ToString();
         user.Password = Hasher.HashPassword($"{user.Password}{user.Salt}");

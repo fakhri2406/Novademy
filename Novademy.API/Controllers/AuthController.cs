@@ -40,6 +40,7 @@ public class AuthController : ControllerBase
     [HttpPost]
     [Route(ApiEndPoints.Auth.Register)]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromForm] RegisterRequest request)
     {
@@ -55,6 +56,10 @@ public class AuthController : ControllerBase
             var registeredUser = await _repo.RegisterUserAsync(user, request.ProfilePicture ?? null);
             return CreatedAtAction(nameof(Register), new { id = registeredUser.Id },
                 $"User with ID {registeredUser.Id} registered successfully.");
+        }
+        catch (ArgumentException ex)
+        {
+            return Conflict(ex.Message);
         }
         catch (Exception ex)
         {
