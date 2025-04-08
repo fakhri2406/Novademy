@@ -10,6 +10,8 @@ public class ApiEndPoints
         
         public const string Register = BaseUrl + "/register";
         public const string Login = $"{BaseUrl}/login";
+        public const string Refresh = $"{BaseUrl}/refresh";
+        public const string Logout = $"{BaseUrl}/logout/{{id::guid}}";
     }
     
     public static class Course
