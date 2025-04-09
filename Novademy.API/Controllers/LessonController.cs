@@ -83,7 +83,7 @@ public class LessonController : ControllerBase
             var isAdmin = User.IsInRole("Admin");
             var isTeacher = User.IsInRole("Teacher");
             
-            if ((!isAdmin || !isTeacher) && !lesson!.IsFree)
+            if ((!isAdmin && !isTeacher) && !lesson!.IsFree)
             {
                 var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
                 var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForLessonAsync(userId, id);
