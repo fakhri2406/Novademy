@@ -34,15 +34,19 @@ public static class DependencyInjection
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         #region EF Core
-        
+    
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("Azure"),
-                sqlServerOptions => sqlServerOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(10),
-                    errorNumbersToAdd: null)));
-        
+                sqlServerOptions => 
+                {
+                    sqlServerOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(10),
+                        errorNumbersToAdd: null);
+                    sqlServerOptions.MigrationsAssembly("Novademy.Application");
+                }));
+    
         #endregion
         
         #region Dapper
