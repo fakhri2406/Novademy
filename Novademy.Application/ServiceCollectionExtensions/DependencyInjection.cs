@@ -26,6 +26,8 @@ public static class DependencyInjection
         services.AddScoped<IPackageRepository, PackageRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IQuizRepository, QuizRepository>();
+        services.AddScoped<IQuestionRepository, QuestionRepository>();
+        services.AddScoped<IAnswerRepository, AnswerRepository>();
         
         return services;
     }
