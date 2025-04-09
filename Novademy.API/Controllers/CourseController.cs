@@ -72,7 +72,7 @@ public class CourseController : ControllerBase
             var isAdmin = User.IsInRole("Admin");
             var isTeacher = User.IsInRole("Teacher");
             
-            if (!isAdmin || !isTeacher)
+            if (!isAdmin && !isTeacher)
             {
                 var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
                 var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForCourseAsync(userId, id);
