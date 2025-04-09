@@ -50,6 +50,7 @@ public class QuizController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetQuizzes(Guid lessonId)
     {
         var quizzes = await _quizRepo.GetQuizzesByLessonIdAsync(lessonId);
@@ -67,6 +68,7 @@ public class QuizController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetQuiz(Guid id)
     {
         try
@@ -100,6 +102,7 @@ public class QuizController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateQuiz([FromBody] CreateQuizRequest request)
     {
@@ -138,6 +141,7 @@ public class QuizController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> UpdateQuiz(Guid id, [FromBody] UpdateQuizRequest request)
     {
@@ -177,6 +181,7 @@ public class QuizController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> DeleteQuiz(Guid id)
     {
@@ -210,6 +215,7 @@ public class QuizController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetQuestion(Guid id)
     {
         try
@@ -243,6 +249,7 @@ public class QuizController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateQuestion([FromBody] CreateQuestionRequest request)
     {

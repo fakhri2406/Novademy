@@ -36,6 +36,7 @@ public class SubscriptionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetActiveSubscriptions([FromRoute] Guid userId)
     {
         try
@@ -65,6 +66,7 @@ public class SubscriptionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Subscribe([FromBody] SubscriptionRequest request)
     {
         await _subscribeValidator.ValidateAndThrowAsync(request);
