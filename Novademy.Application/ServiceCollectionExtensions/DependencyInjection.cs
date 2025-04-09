@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Novademy.Application.Data.EFCore;
 using Novademy.Application.Cloudinary;
-using Novademy.Application.Data.Dapper;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Repositories.Concrete;
 using Novademy.Application.Tokens;
@@ -33,8 +32,6 @@ public static class DependencyInjection
     
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        #region EF Core
-    
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("Azure"),
@@ -46,16 +43,6 @@ public static class DependencyInjection
                         errorNumbersToAdd: null);
                     sqlServerOptions.MigrationsAssembly("Novademy.Application");
                 }));
-    
-        #endregion
-        
-        #region Dapper
-        
-        services.AddScoped<IDbConnectionFactory, MsSqlConnectionFactory>(provider =>
-            new MsSqlConnectionFactory(
-                configuration.GetConnectionString("Azure")!));
-        
-        #endregion
         
         return services;
     }
