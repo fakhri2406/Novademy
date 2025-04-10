@@ -127,6 +127,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
+    [HttpPost]
     [Route(ApiEndPoints.Auth.Refresh)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -182,6 +183,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
+    [HttpPost]
     [Route(ApiEndPoints.Auth.Logout)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
