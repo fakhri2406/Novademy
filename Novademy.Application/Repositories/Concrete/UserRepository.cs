@@ -38,6 +38,11 @@ public class UserRepository : IUserRepository
             throw new ArgumentException("Phone number already exists.");
         }
         
+        if (await _context.Users.AnyAsync(u => u.RoleId == 1) && user.RoleId == 1)
+        {
+            throw new ArgumentException("Admin already exists.");
+        }
+        
         user.Password = Hasher.HashPassword($"{user.Password}{user.Salt}");
         
         if (profilePicture is not null)
