@@ -157,6 +157,7 @@ public class PackageControllerTests
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(nameof(_controller.GetPackage), createdResult.ActionName);
+        Assert.NotNull(createdResult.RouteValues);
         Assert.Equal(createdPackage.Id, createdResult.RouteValues["id"]);
         Assert.Equal($"Package with ID {createdPackage.Id} created successfully.", createdResult.Value);
     }

@@ -161,6 +161,7 @@ public class QuizControllerTests
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(nameof(_controller.GetQuiz), createdResult.ActionName);
+        Assert.NotNull(createdResult.RouteValues);
         Assert.Equal(createdQuiz.Id, createdResult.RouteValues["id"]);
     }
     
