@@ -10,9 +10,10 @@ Icon?
 .Trashes
 
 # ====================
-# Rider IDE Files
+# IDE Files
 # ====================
 .idea/
+.vscode/
 *.sln.iml
 
 # ====================
