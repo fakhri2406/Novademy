@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.Application", "Nov
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.API", "Novademy.API\Novademy.API.csproj", "{283D109A-A531-48DF-AA27-52B264A785C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.UnitTests", "Novademy.UnitTests\Novademy.UnitTests.csproj", "{CFC34C96-182C-477E-BA82-B413C91E3A98}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
