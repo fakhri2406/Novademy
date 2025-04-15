@@ -116,6 +116,7 @@ public class SubscriptionControllerTests
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(nameof(_controller.GetActiveSubscriptions), createdResult.ActionName);
+        Assert.NotNull(createdResult.RouteValues);
         Assert.Equal(request.UserId, createdResult.RouteValues["userId"]);
     }
     
