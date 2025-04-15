@@ -111,12 +111,6 @@ public static class DependencyInjection
         services.AddSingleton<IMediaUpload, MediaUpload>();
         
         #endregion
-
-        #region AI Chat Service
-
-        services.AddScoped<IAIChatService, AIChatService>();
-
-        #endregion
         
         return services;
     }
