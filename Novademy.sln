@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.Application", "Nov
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.API", "Novademy.API\Novademy.API.csproj", "{283D109A-A531-48DF-AA27-52B264A785C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Novademy.UnitTests", "Novademy.UnitTests\Novademy.UnitTests.csproj", "{80F4679B-8CAA-4596-8094-2B84AF6DCEE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,5 +30,9 @@ Global
 		{CFC34C96-182C-477E-BA82-B413C91E3A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFC34C96-182C-477E-BA82-B413C91E3A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFC34C96-182C-477E-BA82-B413C91E3A98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80F4679B-8CAA-4596-8094-2B84AF6DCEE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80F4679B-8CAA-4596-8094-2B84AF6DCEE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80F4679B-8CAA-4596-8094-2B84AF6DCEE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80F4679B-8CAA-4596-8094-2B84AF6DCEE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
