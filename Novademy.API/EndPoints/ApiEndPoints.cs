@@ -68,11 +68,4 @@ public class ApiEndPoints
         public const string GetActiveSubscriptions = $"{BaseUrl}/active/{{userId::guid}}";
         public const string Subscribe = $"{BaseUrl}";
     }
-
-    public static class AIChat
-    {
-        private const string BaseUrl = $"{ApiBaseUrl}/ai-chat";
-        
-        public const string Chat = BaseUrl;
-    }
 }
