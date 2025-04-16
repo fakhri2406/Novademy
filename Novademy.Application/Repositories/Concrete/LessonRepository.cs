@@ -1,7 +1,7 @@
+using Dapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Novademy.Application.Cloudinary;
-using Novademy.Application.Data.EFCore;
+using Novademy.Application.Data.Dapper;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
@@ -9,12 +9,12 @@ namespace Novademy.Application.Repositories.Concrete;
 
 public class LessonRepository : ILessonRepository
 {
-    private readonly AppDbContext _context;
+    private readonly IDbConnectionFactory _connectionFactory;
     private readonly IMediaUpload _mediaUpload;
     
-    public LessonRepository(AppDbContext context, IMediaUpload mediaUpload)
+    public LessonRepository(IDbConnectionFactory connectionFactory, IMediaUpload mediaUpload)
     {
-        _context = context;
+        _connectionFactory = connectionFactory;
         _mediaUpload = mediaUpload;
     }
     
@@ -31,8 +31,16 @@ public class LessonRepository : ILessonRepository
             lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
         }
         
-        _context.Lessons.Add(lesson);
-        await _context.SaveChangesAsync();
+        const string sql = @"
+            INSERT INTO Lessons (Id, Title, Description, 
+            VideoUrl, Order, IsFree, Transcript, 
+            ImageUrl, CreatedAt, UpdatedAt, CourseId)
+            VALUES (@Id, @Title, @Description, 
+            @VideoUrl, @Order, @IsFree, @Transcript, 
+            @ImageUrl, @CreatedAt, @UpdatedAt, @CourseId)";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        await connection.ExecuteAsync(sql, lesson);
         
         return lesson;
     }
@@ -43,22 +51,38 @@ public class LessonRepository : ILessonRepository
     
     public async Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(Guid courseId)
     {
-        if (!_context.Courses.Any(c => c.Id == courseId))
+        const string sql = @"
+            SELECT *
+            FROM Lessons
+            WHERE CourseId = @CourseId";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        var lessons = await connection.QueryAsync<Lesson>(sql, new { CourseId = courseId });
+        
+        if (!lessons.Any())
         {
             throw new KeyNotFoundException("Invalid Course ID.");
         }
-        return await _context.Lessons
-            .Where(l => l.CourseId == courseId)
-            .ToListAsync();
+        
+        return lessons;
     }
     
     public async Task<Lesson?> GetLessonByIdAsync(Guid id)
     {
-        if (!_context.Lessons.Any(l => l.Id == id))
+        const string sql = @"
+            SELECT *
+            FROM Lessons
+            WHERE Id = @Id";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        var lesson = await connection.QueryFirstOrDefaultAsync<Lesson>(sql, new { Id = id });
+        
+        if (lesson == null)
         {
             throw new KeyNotFoundException("Invalid Lesson ID.");
         }
-        return await _context.Lessons.FindAsync(id);
+        
+        return lesson;
     }
     
     #endregion
@@ -76,8 +100,19 @@ public class LessonRepository : ILessonRepository
             lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
         }
         
-        _context.Lessons.Update(lesson);
-        await _context.SaveChangesAsync();
+        const string sql = @"
+            UPDATE Lessons 
+            SET Title = @Title,
+                Description = @Description,
+                VideoUrl = @VideoUrl,
+                Order = @Order,
+                Transcript = @Transcript,
+                ImageUrl = @ImageUrl,
+                UpdatedAt = @UpdatedAt
+            WHERE Id = @Id";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        await connection.ExecuteAsync(sql, lesson);
         
         return lesson;
     }
@@ -88,15 +123,15 @@ public class LessonRepository : ILessonRepository
     
     public async Task DeleteLessonAsync(Guid id)
     {
-        var lesson = await _context.Lessons.FindAsync(id);
+        const string sql = "DELETE FROM Lessons WHERE Id = @Id";
         
-        if (lesson is null)
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        var affectedRows = await connection.ExecuteAsync(sql, new { Id = id });
+        
+        if (affectedRows == 0)
         {
             throw new KeyNotFoundException("Invalid Lesson ID.");
         }
-        
-        _context.Lessons.Remove(lesson);
-        await _context.SaveChangesAsync();
     }
     
     #endregion

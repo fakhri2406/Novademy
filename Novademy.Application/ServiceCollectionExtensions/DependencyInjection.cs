@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Novademy.Application.Data.Dapper;
 using Novademy.Application.Data.EFCore;
 using Novademy.Application.Cloudinary;
 using Novademy.Application.Repositories.Abstract;
@@ -34,6 +35,8 @@ public static class DependencyInjection
     
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
+        
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("Azure"),

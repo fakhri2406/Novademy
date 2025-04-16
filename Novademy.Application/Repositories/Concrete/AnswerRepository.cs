@@ -1,4 +1,5 @@
-using Novademy.Application.Data.EFCore;
+using Dapper;
+using Novademy.Application.Data.Dapper;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
@@ -6,19 +7,23 @@ namespace Novademy.Application.Repositories.Concrete;
 
 public class AnswerRepository : IAnswerRepository
 {
-    private readonly AppDbContext _context;
+    private readonly IDbConnectionFactory _connectionFactory;
     
-    public AnswerRepository(AppDbContext context)
+    public AnswerRepository(IDbConnectionFactory connectionFactory)
     {
-        _context = context;
+        _connectionFactory = connectionFactory;
     }
 
     #region Create
     
     public async Task<Answer> CreateAnswerAsync(Answer answer)
     {
-        _context.Answers.Add(answer);
-        await _context.SaveChangesAsync();
+        const string sql = @"
+            INSERT INTO Answers (Id, QuestionId, Text, IsCorrect, CreatedAt, UpdatedAt)
+            VALUES (@Id, @QuestionId, @Text, @IsCorrect, @CreatedAt, @UpdatedAt)";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        await connection.ExecuteAsync(sql, answer);
         
         return answer;
     }

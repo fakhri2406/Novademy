@@ -1,7 +1,7 @@
+using Dapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Novademy.Application.Cloudinary;
-using Novademy.Application.Data.EFCore;
+using Novademy.Application.Data.Dapper;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
@@ -9,12 +9,12 @@ namespace Novademy.Application.Repositories.Concrete;
 
 public class CourseRepository : ICourseRepository
 {
-    private readonly AppDbContext _context;
+    private readonly IDbConnectionFactory _connectionFactory;
     private readonly IMediaUpload _mediaUpload;
     
-    public CourseRepository(AppDbContext context, IMediaUpload mediaUpload)
+    public CourseRepository(IDbConnectionFactory connectionFactory, IMediaUpload mediaUpload)
     {
-        _context = context;
+        _connectionFactory = connectionFactory;
         _mediaUpload = mediaUpload;
     }
     
@@ -28,8 +28,12 @@ public class CourseRepository : ICourseRepository
             course.ImageUrl = uploadResult.SecureUrl.ToString();
         }
         
-        _context.Courses.Add(course);
-        await _context.SaveChangesAsync();
+        const string sql = @"
+            INSERT INTO Courses (Id, Title, Description, Subject, ImageUrl, CreatedAt, UpdatedAt)
+            VALUES (@Id, @Title, @Description, @Subject, @ImageUrl, @CreatedAt, @UpdatedAt)";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        await connection.ExecuteAsync(sql, course);
         
         return course;
     }
@@ -40,16 +44,28 @@ public class CourseRepository : ICourseRepository
     
     public async Task<IEnumerable<Course>> GetAllCoursesAsync()
     {
-        return await _context.Courses.ToListAsync();
+        const string sql = "SELECT * FROM Courses";
+        
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        return await connection.QueryAsync<Course>(sql);
     }
     
     public async Task<Course?> GetCourseByIdAsync(Guid id)
     {
-        if (!_context.Courses.Any(c => c.Id == id))
+        const string sql = @"
+            SELECT *
+            FROM Courses
+            WHERE Id = @Id";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        var course = await connection.QueryFirstOrDefaultAsync<Course>(sql, new { Id = id });
+        
+        if (course == null)
         {
             throw new KeyNotFoundException("Invalid Course ID.");
         }
-        return await _context.Courses.FindAsync(id);
+        
+        return course;
     }
     
     #endregion
@@ -64,8 +80,17 @@ public class CourseRepository : ICourseRepository
             course.ImageUrl = uploadResult.SecureUrl.ToString();
         }
         
-        _context.Courses.Update(course);
-        await _context.SaveChangesAsync();
+        const string sql = @"
+            UPDATE Courses 
+            SET Title = @Title,
+                Description = @Description,
+                Subject = @Subject,
+                ImageUrl = @ImageUrl,
+                UpdatedAt = @UpdatedAt
+            WHERE Id = @Id";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        await connection.ExecuteAsync(sql, course);
         
         return course;
     }
@@ -76,15 +101,15 @@ public class CourseRepository : ICourseRepository
     
     public async Task DeleteCourseAsync(Guid id)
     {
-        var course = await _context.Courses.FindAsync(id);
+        const string sql = "DELETE FROM Courses WHERE Id = @Id";
         
-        if (course is null)
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        var affectedRows = await connection.ExecuteAsync(sql, new { Id = id });
+        
+        if (affectedRows == 0)
         {
             throw new KeyNotFoundException("Invalid Course ID.");
         }
-        
-        _context.Courses.Remove(course);
-        await _context.SaveChangesAsync();
     }
     
     #endregion

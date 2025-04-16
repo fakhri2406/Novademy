@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using Novademy.Application.Data.EFCore;
+using Dapper;
+using Novademy.Application.Data.Dapper;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
@@ -7,19 +7,23 @@ namespace Novademy.Application.Repositories.Concrete;
 
 public class SubscriptionRepository : ISubscriptionRepository
 {
-    private readonly AppDbContext _context;
+    private readonly IDbConnectionFactory _connectionFactory;
     
-    public SubscriptionRepository(AppDbContext context)
+    public SubscriptionRepository(IDbConnectionFactory connectionFactory)
     {
-        _context = context;
+        _connectionFactory = connectionFactory;
     }
     
     #region Create
     
     public async Task<Subscription> CreateSubscriptionAsync(Subscription subscription)
     {
-        _context.Subscriptions.Add(subscription);
-        await _context.SaveChangesAsync();
+        const string sql = @"
+            INSERT INTO Subscriptions (Id, UserId, PackageId, StartDate, EndDate, IsActive, CreatedAt, UpdatedAt)
+            VALUES (@Id, @UserId, @PackageId, @StartDate, @EndDate, @IsActive, @CreatedAt, @UpdatedAt)";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        await connection.ExecuteAsync(sql, subscription);
         
         return subscription;
     }
@@ -30,15 +34,41 @@ public class SubscriptionRepository : ISubscriptionRepository
     
     public async Task<IEnumerable<Subscription>> GetActiveSubscriptionsByUserIdAsync(Guid userId)
     {
-        if (!_context.Users.Any(u => u.Id == userId))
-        {
-            throw new KeyNotFoundException("Invalid User ID.");
-        }
-        return await _context.Subscriptions
-            .Where(s => s.UserId == userId && s.IsActive)
-            .Include(s => s.Package)
-            .ThenInclude(p => p!.Courses)
-            .ToListAsync();
+        const string sql = @"
+            SELECT s.*, p.*, c.*
+            FROM Subscriptions s
+            LEFT JOIN Packages p ON s.PackageId = p.Id
+            LEFT JOIN PackageCourses pc ON p.Id = pc.PackageId
+            LEFT JOIN Courses c ON pc.CourseId = c.Id
+            WHERE s.UserId = @UserId AND s.IsActive = 1";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        
+        var subscriptionDictionary = new Dictionary<Guid, Subscription>();
+        var result = await connection.QueryAsync<Subscription, Package, Course, Subscription>(
+            sql,
+            (subscription, package, course) =>
+            {
+                if (!subscriptionDictionary.TryGetValue(subscription.Id, out var subscriptionEntry))
+                {
+                    subscriptionEntry = subscription;
+                    subscriptionEntry.Package = package;
+                    subscriptionEntry.Package.Courses = new List<Course>();
+                    subscriptionDictionary.Add(subscriptionEntry.Id, subscriptionEntry);
+                }
+                
+                if (course != null && !subscriptionEntry.Package.Courses.Any(c => c.Id == course.Id))
+                {
+                    subscriptionEntry.Package.Courses.Add(course);
+                }
+                
+                return subscriptionEntry;
+            },
+            new { UserId = userId },
+            splitOn: "Id,Id"
+        );
+        
+        return subscriptionDictionary.Values;
     }
     
     #endregion
@@ -47,16 +77,15 @@ public class SubscriptionRepository : ISubscriptionRepository
     
     public async Task<bool> HasActiveSubscriptionForPackageAsync(Guid userId, Guid packageId)
     {
-        if (!_context.Users.Any(u => u.Id == userId))
-        {
-            throw new KeyNotFoundException("Invalid User ID.");
-        }
-        if (!_context.Packages.Any(p => p.Id == packageId))
-        {
-            throw new KeyNotFoundException("Invalid Package ID.");
-        }
-        return await _context.Subscriptions
-            .AnyAsync(s => s.UserId == userId && s.PackageId == packageId && s.IsActive);
+        const string sql = @"
+            SELECT COUNT(1)
+            FROM Subscriptions
+            WHERE UserId = @UserId AND PackageId = @PackageId AND IsActive = 1";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        var count = await connection.ExecuteScalarAsync<int>(sql, new { UserId = userId, PackageId = packageId });
+        
+        return count > 0;
     }
     
     #endregion
@@ -65,17 +94,16 @@ public class SubscriptionRepository : ISubscriptionRepository
     
     public async Task<bool> HasActiveSubscriptionForCourseAsync(Guid userId, Guid courseId)
     {
-        if (!_context.Users.Any(u => u.Id == userId))
-        {
-            throw new KeyNotFoundException("Invalid User ID.");
-        }
-        if (!_context.Courses.Any(c => c.Id == courseId))
-        {
-            throw new KeyNotFoundException("Invalid Course ID.");
-        }
-        return await _context.Subscriptions
-            .Where(s => s.UserId == userId && s.IsActive)
-            .AnyAsync(s => s.Package!.Courses.Any(c => c.Id == courseId));
+        const string sql = @"
+            SELECT COUNT(1)
+            FROM Subscriptions s
+            INNER JOIN PackageCourses pc ON s.PackageId = pc.PackageId
+            WHERE s.UserId = @UserId AND pc.CourseId = @CourseId AND s.IsActive = 1";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        var count = await connection.ExecuteScalarAsync<int>(sql, new { UserId = userId, CourseId = courseId });
+        
+        return count > 0;
     }
     
     #endregion
@@ -84,17 +112,18 @@ public class SubscriptionRepository : ISubscriptionRepository
     
     public async Task<bool> HasActiveSubscriptionForLessonAsync(Guid userId, Guid lessonId)
     {
-        if (!_context.Users.Any(u => u.Id == userId))
-        {
-            throw new KeyNotFoundException("Invalid User ID.");
-        }
-        if (!_context.Lessons.Any(l => l.Id == lessonId))
-        {
-            throw new KeyNotFoundException("Invalid Lesson ID.");
-        }
-        return await _context.Subscriptions
-            .Where(s => s.UserId == userId && s.IsActive)
-            .AnyAsync(s => s.Package!.Courses.Any(c => c.Lessons.Any(l => l.Id == lessonId)));
+        const string sql = @"
+            SELECT COUNT(1)
+            FROM Subscriptions s
+            INNER JOIN PackageCourses pc ON s.PackageId = pc.PackageId
+            INNER JOIN Courses c ON pc.CourseId = c.Id
+            INNER JOIN Lessons l ON c.Id = l.CourseId
+            WHERE s.UserId = @UserId AND l.Id = @LessonId AND s.IsActive = 1";
+            
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+        var count = await connection.ExecuteScalarAsync<int>(sql, new { UserId = userId, LessonId = lessonId });
+        
+        return count > 0;
     }
     
     #endregion

@@ -86,6 +86,7 @@ public static class ContractMapping
             Description = request.Description,
             Order = request.Order,
             Transcript = request.Transcript,
+            IsFree = request.IsFree,
             CourseId = request.CourseId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

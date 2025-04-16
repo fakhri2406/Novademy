@@ -87,9 +87,6 @@ public class AuthController : ControllerBase
         {
             var user = await _repo.LoginUserAsync(request.Username, request.Password);
             
-            user.LastLoginAt = DateTime.UtcNow;
-            await _repo.UpdateUserAsync(user);
-            
             var accessToken = _tokenGenerator.GenerateAccessToken(user);
             var refreshToken = new RefreshToken
             {
