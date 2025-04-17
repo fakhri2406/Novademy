@@ -52,7 +52,7 @@ public static class DependencyInjection
         return services;
     }
     
-    public static IServiceCollection AddTokens(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
         
@@ -93,7 +93,7 @@ public static class DependencyInjection
         return services;
     }
     
-    public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddExternalServices(this IServiceCollection services, IConfiguration configuration)
     {
         #region Validators
         

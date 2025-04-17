@@ -9,24 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-#region CORS
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        builder => builder
-            .SetIsOriginAllowed(_ => true)
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
-});
-
-#endregion
-
 builder.Services.AddRepositories();
 builder.Services.AddDatabase(builder.Configuration);
-builder.Services.AddTokens(builder.Configuration);
-builder.Services.AddConfigurations(builder.Configuration);
+builder.Services.AddAuth(builder.Configuration);
+builder.Services.AddExternalServices(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -64,6 +50,20 @@ builder.Services.AddSwaggerGen(options =>
     
     #endregion
 });
+
+#region CORS
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder => builder
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
+
+#endregion
 
 #region Rate Limiting
 
