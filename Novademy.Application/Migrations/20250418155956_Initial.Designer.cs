@@ -12,7 +12,7 @@ using Novademy.Application.Data.EFCore;
 namespace Novademy.Application.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250414152156_Initial")]
+    [Migration("20250418155956_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
