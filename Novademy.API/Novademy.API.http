@@ -1,4 +1,4 @@
-@Novademy.API_HostAddress = http://localhost:5258
+@Novademy.API_HostAddress = https://novademy-api-bvdbf9f2enc5e4d4.uaenorth-01.azurewebsites.net
 
 GET {{Novademy.API_HostAddress}}/weatherforecast/
 Accept: application/json

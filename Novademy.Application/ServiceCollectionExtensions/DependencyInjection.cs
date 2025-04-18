@@ -39,7 +39,7 @@ public static class DependencyInjection
         
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
-                configuration.GetConnectionString("Azure"),
+                configuration.GetConnectionString("DefaultConnection"),
                 sqlServerOptions => 
                 {
                     sqlServerOptions.EnableRetryOnFailure(

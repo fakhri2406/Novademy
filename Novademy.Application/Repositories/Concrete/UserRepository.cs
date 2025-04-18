@@ -126,8 +126,8 @@ public class UserRepository : IUserRepository
     public async Task CreateRefreshTokenAsync(RefreshToken refreshToken)
     {
         const string sql = @"
-            INSERT INTO RefreshTokens (Id, Token, UserId, ExpiresAt, CreatedAt, UpdatedAt)
-            VALUES (@Id, @Token, @UserId, @ExpiresAt, @CreatedAt, @UpdatedAt)";
+            INSERT INTO RefreshTokens (Id, Token, UserId, ExpiresAt)
+            VALUES (@Id, @Token, @UserId, @ExpiresAt)";
             
         using var connection = await _connectionFactory.CreateConnectionAsync();
         await connection.ExecuteAsync(sql, refreshToken);

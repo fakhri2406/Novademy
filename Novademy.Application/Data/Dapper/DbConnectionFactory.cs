@@ -12,7 +12,7 @@ public class DbConnectionFactory : IDbConnectionFactory
     public DbConnectionFactory(IConfiguration configuration)
     {
         _configuration = configuration;
-        _connectionString = _configuration.GetConnectionString("Azure")!;
+        _connectionString = _configuration.GetConnectionString("DefaultConnection")!;
     }
     
     public async Task<IDbConnection> CreateConnectionAsync()
