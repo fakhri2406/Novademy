@@ -1,15 +1,13 @@
 using System.Text;
-using CloudinaryDotNet;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Novademy.Application.Data.Dapper;
 using Novademy.Application.Data.EFCore;
-using Novademy.Application.Cloudinary;
+using Novademy.Application.ExternalServices.AzureBlobStorage;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Repositories.Concrete;
 using Novademy.Application.Tokens;
@@ -101,17 +99,10 @@ public static class DependencyInjection
         
         #endregion
         
-        #region Cloudinary
+        #region Azure Blob Storage
         
-        services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
-        
-        services.AddSingleton<CloudinaryDotNet.Cloudinary>(sp =>
-        {
-            var config = sp.GetRequiredService<IOptions<CloudinarySettings>>().Value;
-            return new CloudinaryDotNet.Cloudinary(new Account(config.CloudName, config.ApiKey, config.ApiSecret));
-        });
-        
-        services.AddSingleton<IMediaUpload, MediaUpload>();
+        services.Configure<AzureBlobOptions>(configuration.GetSection("AzureBlobStorage"));
+        services.AddSingleton<IAzureBlobService, AzureBlobService>();
         
         #endregion
         

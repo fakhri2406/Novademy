@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.AspNetCore.Http;
-using Novademy.Application.Cloudinary;
 using Novademy.Application.Data.Dapper;
+using Novademy.Application.ExternalServices.AzureBlobStorage;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
@@ -10,12 +10,12 @@ namespace Novademy.Application.Repositories.Concrete;
 public class PackageRepository : IPackageRepository
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    private readonly IMediaUpload _mediaUpload;
+    private readonly IAzureBlobService _azureBlobService;
     
-    public PackageRepository(IDbConnectionFactory connectionFactory, IMediaUpload mediaUpload)
+    public PackageRepository(IDbConnectionFactory connectionFactory, IAzureBlobService azureBlobService)
     {
         _connectionFactory = connectionFactory;
-        _mediaUpload = mediaUpload;
+        _azureBlobService = azureBlobService;
     }
     
     #region Create
@@ -24,8 +24,8 @@ public class PackageRepository : IPackageRepository
     {
         if (image is not null)
         {
-            var uploadResult = await _mediaUpload.UploadImageAsync(image, "packages");
-            package.ImageUrl = uploadResult.SecureUrl.ToString();
+            var imageUploadResult = await _azureBlobService.UploadFileAsync(image);
+            package.ImageUrl = imageUploadResult;
         }
         
         const string sql = @"
@@ -128,8 +128,8 @@ public class PackageRepository : IPackageRepository
     {
         if (image is not null)
         {
-            var uploadResult = await _mediaUpload.UploadImageAsync(image, "packages");
-            package.ImageUrl = uploadResult.SecureUrl.ToString();
+            var imageUploadResult = await _azureBlobService.UploadFileAsync(image);
+            package.ImageUrl = imageUploadResult;
         }
         
         const string sql = @"
@@ -154,14 +154,24 @@ public class PackageRepository : IPackageRepository
     
     public async Task DeletePackageAsync(Guid id)
     {
-        const string sql = "DELETE FROM Packages WHERE Id = @Id";
-        
+        const string findImageSql = "SELECT ImageUrl FROM Packages WHERE Id = @Id";
+        const string deletePackageSql = "DELETE FROM Packages WHERE Id = @Id";
+    
         using var connection = await _connectionFactory.CreateConnectionAsync();
-        var affectedRows = await connection.ExecuteAsync(sql, new { Id = id });
         
+        var imageUrl = await connection.QueryFirstOrDefaultAsync<string>(findImageSql, new { Id = id });
+        
+        if (!string.IsNullOrEmpty(imageUrl))
+        {
+            var fileName = Path.GetFileName(new Uri(imageUrl).LocalPath);
+            await _azureBlobService.DeleteFileAsync(fileName);
+        }
+        
+        var affectedRows = await connection.ExecuteAsync(deletePackageSql, new { Id = id });
+
         if (affectedRows == 0)
         {
-            throw new KeyNotFoundException("Invalid Package ID.");
+            throw new KeyNotFoundException("Invalid Lesson ID.");
         }
     }
     

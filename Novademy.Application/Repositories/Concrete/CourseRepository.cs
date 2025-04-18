@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.AspNetCore.Http;
-using Novademy.Application.Cloudinary;
 using Novademy.Application.Data.Dapper;
+using Novademy.Application.ExternalServices.AzureBlobStorage;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
@@ -10,12 +10,12 @@ namespace Novademy.Application.Repositories.Concrete;
 public class CourseRepository : ICourseRepository
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    private readonly IMediaUpload _mediaUpload;
+    private readonly IAzureBlobService _azureBlobService;
     
-    public CourseRepository(IDbConnectionFactory connectionFactory, IMediaUpload mediaUpload)
+    public CourseRepository(IDbConnectionFactory connectionFactory, IAzureBlobService azureBlobService)
     {
         _connectionFactory = connectionFactory;
-        _mediaUpload = mediaUpload;
+        _azureBlobService = azureBlobService;
     }
     
     #region Create
@@ -24,8 +24,8 @@ public class CourseRepository : ICourseRepository
     {
         if (image is not null)
         {
-            var uploadResult = await _mediaUpload.UploadImageAsync(image, "courses");
-            course.ImageUrl = uploadResult.SecureUrl.ToString();
+            var uploadResult = await _azureBlobService.UploadFileAsync(image);
+            course.ImageUrl = uploadResult;
         }
         
         const string sql = @"
@@ -76,8 +76,8 @@ public class CourseRepository : ICourseRepository
     {
         if (image is not null)
         {
-            var uploadResult = await _mediaUpload.UploadImageAsync(image, "courses");
-            course.ImageUrl = uploadResult.SecureUrl.ToString();
+            var uploadResult = await _azureBlobService.UploadFileAsync(image);
+            course.ImageUrl = uploadResult;
         }
         
         const string sql = @"
@@ -101,11 +101,21 @@ public class CourseRepository : ICourseRepository
     
     public async Task DeleteCourseAsync(Guid id)
     {
-        const string sql = "DELETE FROM Courses WHERE Id = @Id";
-        
+        const string findImageSql = "SELECT ImageUrl FROM Courses WHERE Id = @Id";
+        const string deleteCourseSql = "DELETE FROM Courses WHERE Id = @Id";
+    
         using var connection = await _connectionFactory.CreateConnectionAsync();
-        var affectedRows = await connection.ExecuteAsync(sql, new { Id = id });
         
+        var imageUrl = await connection.QueryFirstOrDefaultAsync<string>(findImageSql, new { Id = id });
+        
+        if (!string.IsNullOrEmpty(imageUrl))
+        {
+            var fileName = Path.GetFileName(new Uri(imageUrl).LocalPath);
+            await _azureBlobService.DeleteFileAsync(fileName);
+        }
+        
+        var affectedRows = await connection.ExecuteAsync(deleteCourseSql, new { Id = id });
+
         if (affectedRows == 0)
         {
             throw new KeyNotFoundException("Invalid Course ID.");

@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.AspNetCore.Http;
-using Novademy.Application.Cloudinary;
 using Novademy.Application.Data.Dapper;
+using Novademy.Application.ExternalServices.AzureBlobStorage;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
@@ -10,25 +10,25 @@ namespace Novademy.Application.Repositories.Concrete;
 public class LessonRepository : ILessonRepository
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    private readonly IMediaUpload _mediaUpload;
+    private readonly IAzureBlobService _azureBlobService;
     
-    public LessonRepository(IDbConnectionFactory connectionFactory, IMediaUpload mediaUpload)
+    public LessonRepository(IDbConnectionFactory connectionFactory, IAzureBlobService azureBlobService)
     {
         _connectionFactory = connectionFactory;
-        _mediaUpload = mediaUpload;
+        _azureBlobService = azureBlobService;
     }
     
     #region Create
     
     public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
-        var videoUploadResult = await _mediaUpload.UploadVideoAsync(video, "lesson_videos");
-        lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
+        var videoUploadResult = await _azureBlobService.UploadFileAsync(video);
+        lesson.VideoUrl = videoUploadResult;
         
         if (image is not null)
         {
-            var imageUploadResult = await _mediaUpload.UploadImageAsync(image, "lesson_images");
-            lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
+            var imageUploadResult = await _azureBlobService.UploadFileAsync(image);
+            lesson.ImageUrl = imageUploadResult;
         }
         
         const string sql = @"
@@ -91,13 +91,13 @@ public class LessonRepository : ILessonRepository
     
     public async Task<Lesson?> UpdateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
-        var videoUploadResult = await _mediaUpload.UploadVideoAsync(video, "lesson_videos");
-        lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
+        var videoUploadResult = await _azureBlobService.UploadFileAsync(video);
+        lesson.VideoUrl = videoUploadResult;
         
         if (image is not null)
         {
-            var imageUploadResult = await _mediaUpload.UploadImageAsync(image, "lesson_images");
-            lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
+            var imageUploadResult = await _azureBlobService.UploadFileAsync(image);
+            lesson.ImageUrl = imageUploadResult;
         }
         
         const string sql = @"
@@ -123,11 +123,30 @@ public class LessonRepository : ILessonRepository
     
     public async Task DeleteLessonAsync(Guid id)
     {
-        const string sql = "DELETE FROM Lessons WHERE Id = @Id";
-        
+        const string findVideoSql = "SELECT VideoUrl FROM Lessons WHERE Id = @Id";
+        const string findImageSql = "SELECT ImageUrl FROM Lessons WHERE Id = @Id";
+        const string deleteLessonSql = "DELETE FROM Lessons WHERE Id = @Id";
+    
         using var connection = await _connectionFactory.CreateConnectionAsync();
-        var affectedRows = await connection.ExecuteAsync(sql, new { Id = id });
         
+        var videoUrl = await connection.QueryFirstOrDefaultAsync<string>(findVideoSql, new { Id = id });
+
+        if (!string.IsNullOrEmpty(videoUrl))
+        {
+            var fileName = Path.GetFileName(new Uri(videoUrl).LocalPath);
+            await _azureBlobService.DeleteFileAsync(fileName);
+        }
+        
+        var imageUrl = await connection.QueryFirstOrDefaultAsync<string>(findImageSql, new { Id = id });
+        
+        if (!string.IsNullOrEmpty(imageUrl))
+        {
+            var fileName = Path.GetFileName(new Uri(imageUrl).LocalPath);
+            await _azureBlobService.DeleteFileAsync(fileName);
+        }
+        
+        var affectedRows = await connection.ExecuteAsync(deleteLessonSql, new { Id = id });
+
         if (affectedRows == 0)
         {
             throw new KeyNotFoundException("Invalid Lesson ID.");

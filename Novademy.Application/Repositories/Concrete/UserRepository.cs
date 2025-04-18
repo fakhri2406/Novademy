@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.AspNetCore.Http;
-using Novademy.Application.Cloudinary;
 using Novademy.Application.Data.Dapper;
+using Novademy.Application.ExternalServices.AzureBlobStorage;
 using Novademy.Application.Helpers;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
@@ -11,12 +11,12 @@ namespace Novademy.Application.Repositories.Concrete;
 public class UserRepository : IUserRepository
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    private readonly IMediaUpload _mediaUpload;
+    private readonly IAzureBlobService _azureBlobService;
     
-    public UserRepository(IDbConnectionFactory connectionFactory, IMediaUpload mediaUpload)
+    public UserRepository(IDbConnectionFactory connectionFactory, IAzureBlobService azureBlobService)
     {
         _connectionFactory = connectionFactory;
-        _mediaUpload = mediaUpload;
+        _azureBlobService = azureBlobService;
     }
     
     #region Register
@@ -67,8 +67,8 @@ public class UserRepository : IUserRepository
         
         if (profilePicture is not null)
         {
-            var uploadResult = await _mediaUpload.UploadImageAsync(profilePicture, "user_profiles");
-            user.ProfilePictureUrl = uploadResult.SecureUrl.ToString();
+            var uploadResult = await _azureBlobService.UploadFileAsync(profilePicture);
+            user.ProfilePictureUrl = uploadResult;
         }
         
         await connection.ExecuteAsync(insertUserSql, user);
