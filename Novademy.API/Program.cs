@@ -101,4 +101,5 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapGet("/ping", () => "pong");
 app.Run();
