@@ -1,46 +1,30 @@
-# Novademy
+## Novademy
 
-Novademy is an innovative online education platform specifically designed for Azerbaijani students preparing for their exams. Our mission is to make quality education accessible and affordable for all students in Azerbaijan.
+Welcome to **Novademy**, a transformative online education platform crafted Azerbaijani students preparing for their academic exams. Our mission is to democratize access to high-quality education, empowering every student in Azerbaijan with the tools, resources, and support they need to excel. By blending technology with an understanding of local educational needs, **Novademy** offers an intuitive, affordable, and engaging learning experience.
 
-## 🚀 Getting Started
+### 🌟 Why Novademy?
 
-### Prerequisites
+We provide a comprehensive suite of courses, interactive lessons, and quizzes tailored to the Azerbaijani curriculum, all accessible from anywhere, anytime. Whether you’re a high school student aiming for university admission or seeking to master specific subjects, **Novademy** is your trusted partner in achieving your goals.
 
-- .NET 8.0 SDK
-- SQL Server
-- Docker (optional)
+### 🔍 Key Features
 
-### Installation
+- **Curated Courses:** A catalog of courses covering essential subjects, that align with Azerbaijan’s exam requirements.
+- **Engaging Lessons:** Dynamic video lessons, complete with transcripts and supplementary materials.
+- **Interactive Quizzes:** Test your knowledge with quizzes linked to lessons, offering instant feedback to track your progress.
+- **Flexible Packages:** Affordable subscription plans that bundle courses to suit your learning needs.
 
-1. Clone the repository:
-```bash
-git clone https://github.com/fakhri2406/Novademy.git
-cd Novademy
-```
+### 🚀 Built for Excellence
 
-2. Install backend dependencies:
-```bash
-dotnet restore
-```
-
-3. Configure the database:
-```bash
-dotnet ef database update
-```
-
-4. Run the application:
-```bash
-dotnet run --project Novademy.API
-```
+**Novademy** is powered by a robust **.NET 8.0** backend. It uses **ASP.NET Core** for high-performance APIs, **EF Core** for database migrations and **Dapper** for fast interactions with **MS Azure** SQL Server. [Hosted on **Render**](https://novademy-api.onrender.com) with automatic deployments.
 
 ## 🏗️ Project Structure
 
 ```
 Novademy/
-├── Novademy.API/          # Presentation layer (RESTful APIs)
-├── Novademy.Application/  # Application layer
-├── Novademy.Contracts/    # Data transfer objects
-└── Novademy.UnitTests/    # Unit tests
+├── Novademy.API/
+├── Novademy.Application/
+├── Novademy.Contracts/
+└── Novademy.UnitTests/
 ```
 
 ## 🔧 Tech Stack
@@ -56,6 +40,8 @@ Novademy/
 - **Database**
   - MS Azure SQL Server
 
-## 📚 Documentation
+- **Storage**
+  - MS Azure Blob Storage
 
-- [API Documentation](https://github.com/user-attachments/files/19801481/api.docx)
+- **Hosting**
+  - Render
