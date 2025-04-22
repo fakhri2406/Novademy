@@ -7,7 +7,7 @@ COPY Novademy.sln ./
 COPY Novademy.API/Novademy.API.csproj Novademy.API/
 COPY Novademy.Application/Novademy.Application.csproj Novademy.Application/
 COPY Novademy.Contracts/Novademy.Contracts.csproj Novademy.Contracts/
-COPY Novademy.Contracts/Novademy.Contracts.csproj Novademy.UnitTests/
+COPY Novademy.UnitTests/Novademy.UnitTests.csproj Novademy.UnitTests/
 
 # Restore only once
 RUN dotnet restore
