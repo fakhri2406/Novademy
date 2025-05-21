@@ -10,8 +10,9 @@ We provide a comprehensive suite of courses, interactive lessons, and quizzes ta
 
 - **Curated Courses:** A catalog of courses covering essential subjects, that align with Azerbaijan’s exam requirements.
 - **Engaging Lessons:** Dynamic video lessons, complete with transcripts and supplementary materials.
-- **Interactive Quizzes:** Test your knowledge with quizzes linked to lessons, offering instant feedback to track your progress.
 - **Flexible Packages:** Affordable subscription plans that bundle courses to suit your learning needs.
+- **Interactive Quizzes (coming soon):** Test your knowledge with quizzes linked to lessons, offering instant feedback to track your progress.
+- **AI Integration (coming soon):** Built-in AI chatbot, ready to answer all of your questions based on lesson context.
 
 ### 🚀 Built for Excellence
 
@@ -34,14 +35,16 @@ Novademy/
   - ASP.NET Core Web API
   - Entity Framework Core
   - Dapper
+  - xUnit
+  - Moq
   - JWT Authentication
   - Swagger/OpenAPI
 
 - **Database**
-  - MS Azure SQL Server
+  - MS Azure SQL Server (currently testing on local database)
 
 - **Storage**
-  - MS Azure Blob Storage
+  - MS Azure Blob Storage (currently testing on Cloudinary)
 
 - **Hosting**
-  - Render
+  - Render (currently incative)
