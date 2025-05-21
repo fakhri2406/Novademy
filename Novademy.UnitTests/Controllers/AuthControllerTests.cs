@@ -16,7 +16,7 @@ namespace Novademy.UnitTests.Controllers;
 
 public class AuthControllerTests
 {
-    private readonly Mock<IUserRepository> _repoMock;
+    private readonly Mock<IAuthRepository> _repoMock;
     private readonly Mock<ITokenGenerator> _tokenGeneratorMock;
     private readonly IValidator<RegisterRequest> _registerValidator;
     private readonly IValidator<LoginRequest> _loginValidator;
@@ -24,7 +24,7 @@ public class AuthControllerTests
     
     public AuthControllerTests()
     {
-        _repoMock = new Mock<IUserRepository>();
+        _repoMock = new Mock<IAuthRepository>();
         _tokenGeneratorMock = new Mock<ITokenGenerator>();
         _registerValidator = new RegisterRequestValidator();
         _loginValidator = new LoginRequestValidator();

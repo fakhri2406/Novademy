@@ -10,7 +10,6 @@ using Novademy.API.Mapping;
 namespace Novademy.API.Controllers;
 
 [ApiController]
-[Authorize(Roles = "Admin")]
 public class PackageController : ControllerBase
 {
     private readonly IPackageRepository _repo;
@@ -98,6 +97,7 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreatePackage([FromForm] CreatePackageRequest request)
     {
         await _createValidator.ValidateAndThrowAsync(request);
@@ -149,6 +149,7 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdatePackage([FromRoute] Guid id, [FromForm] UpdatePackageRequest request)
     {
         await _updateValidator.ValidateAndThrowAsync(request);
@@ -204,6 +205,7 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePackage([FromRoute] Guid id)
     {
         try

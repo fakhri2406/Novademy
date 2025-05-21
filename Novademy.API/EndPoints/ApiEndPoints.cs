@@ -47,20 +47,6 @@ public class ApiEndPoints
         public const string DeletePackage = $"{BaseUrl}/{{id::guid}}";
     }
     
-    public static class Quiz
-    {
-        private const string BaseUrl = $"{ApiBaseUrl}/quiz";
-        
-        public const string GetQuizzes = $"{BaseUrl}/lesson/{{lessonId::guid}}";
-        public const string GetQuiz = $"{BaseUrl}/{{id::guid}}";
-        public const string CreateQuiz = $"{BaseUrl}";
-        public const string UpdateQuiz = $"{BaseUrl}/{{id::guid}}";
-        public const string DeleteQuiz = $"{BaseUrl}/{{id::guid}}";
-        
-        public const string GetQuestion = $"{BaseUrl}/question/{{id::guid}}";
-        public const string CreateQuestion = $"{BaseUrl}/question";
-    }
-    
     public static class Subscription
     {
         private const string BaseUrl = $"{ApiBaseUrl}/subscription";

@@ -6,13 +6,17 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <NoWarn>1701;1702;SA1300</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\Novademy.Contracts\Novademy.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
-      <PackageReference Include="Dapper" Version="2.1.66" />
+      <PackageReference Include="CloudinaryDotNet" Version="1.27.5" />
       <PackageReference Include="FluentValidation" Version="11.11.0" />
       <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />

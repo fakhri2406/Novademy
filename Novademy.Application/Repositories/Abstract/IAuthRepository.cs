@@ -3,7 +3,7 @@ using Novademy.Application.Models;
 
 namespace Novademy.Application.Repositories.Abstract;
 
-public interface IUserRepository
+public interface IAuthRepository
 {
     Task<User> RegisterUserAsync(User user, IFormFile? profilePicture);
     Task<User> LoginUserAsync(string username, string password);

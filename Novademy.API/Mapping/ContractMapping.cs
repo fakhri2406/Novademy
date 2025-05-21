@@ -3,7 +3,6 @@ using Novademy.Contracts.Requests.Auth;
 using Novademy.Contracts.Requests.Course;
 using Novademy.Contracts.Requests.Lesson;
 using Novademy.Contracts.Requests.Package;
-using Novademy.Contracts.Requests.Quiz;
 using Novademy.Contracts.Requests.Subscription;
 using Novademy.Contracts.Responses.Course;
 using Novademy.Contracts.Responses.Lesson;
@@ -18,13 +17,6 @@ public static class ContractMapping
     
     public static User MapToUser(this RegisterRequest request)
     {
-        var phoneNumber = request.PhoneNumber;
-        if (phoneNumber.StartsWith("0"))
-        {
-            phoneNumber = phoneNumber.Substring(1);
-        }
-        var formattedPhoneNumber = "+994" + phoneNumber;
-        
         return new User
         {
             Id = Guid.NewGuid(),
@@ -34,11 +26,10 @@ public static class ContractMapping
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            PhoneNumber = formattedPhoneNumber,
+            PhoneNumber = "+994" + request.PhoneNumber,
             RoleId = request.RoleId,
             Group = request.Group,
-            Sector = request.Sector,
-            RegisteredAt = DateTime.UtcNow
+            Sector = request.Sector
         };
     }
     
@@ -168,41 +159,6 @@ public static class ContractMapping
             StartDate = subscription.StartDate,
             EndDate = subscription.EndDate,
             IsActive = subscription.IsActive
-        };
-    }
-    
-    #endregion
-    
-    #region Quiz
-    
-    public static Quiz MapToQuiz(this CreateQuizRequest request)
-    {
-        return new Quiz
-        {
-            Id = Guid.NewGuid(),
-            Title = request.Title,
-            LessonId = request.LessonId
-        };
-    }
-    
-    public static Question MapToQuestion(this CreateQuestionRequest request)
-    {
-        return new Question
-        {
-            Id = Guid.NewGuid(),
-            Text = request.Text,
-            QuizId = request.QuizId
-        };
-    }
-
-    public static Answer MapToAnswer(this CreateAnswerRequest request, Guid questionId)
-    {
-        return new Answer
-        {
-            Id = Guid.NewGuid(),
-            Text = request.Text,
-            IsCorrect = request.IsCorrect,
-            QuestionId = questionId
         };
     }
     

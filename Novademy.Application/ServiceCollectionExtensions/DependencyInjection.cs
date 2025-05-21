@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Novademy.Application.Data.Dapper;
 using Novademy.Application.Data.EFCore;
-using Novademy.Application.ExternalServices.AzureBlobStorage;
+using Novademy.Application.ExternalServices.Cloudinary;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Repositories.Concrete;
 using Novademy.Application.Tokens;
 using Novademy.Application.Validators.Auth;
+using CloudinaryDotNet;
+using Microsoft.Extensions.Options;
 
 namespace Novademy.Application.ServiceCollectionExtensions;
 
@@ -19,33 +20,40 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<IPackageRepository, PackageRepository>();
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
-        services.AddScoped<IQuizRepository, QuizRepository>();
-        services.AddScoped<IQuestionRepository, QuestionRepository>();
-        services.AddScoped<IAnswerRepository, AnswerRepository>();
         
         return services;
     }
     
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
+        #region Azure DB
+        
+        // services.AddDbContext<AppDbContext>(options =>
+        //     options.UseSqlServer(
+        //         configuration.GetConnectionString("DefaultConnection"),
+        //         sqlServerOptions => 
+        //         {
+        //             sqlServerOptions.EnableRetryOnFailure(
+        //                 maxRetryCount: 5,
+        //                 maxRetryDelay: TimeSpan.FromSeconds(10),
+        //                 errorNumbersToAdd: null);
+        //             sqlServerOptions.MigrationsAssembly("Novademy.Application");
+        //         }));
+        
+        #endregion
+        
+        #region Local DB
         
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(
-                configuration.GetConnectionString("DefaultConnection"),
-                sqlServerOptions => 
-                {
-                    sqlServerOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(10),
-                        errorNumbersToAdd: null);
-                    sqlServerOptions.MigrationsAssembly("Novademy.Application");
-                }));
+            options.UseNpgsql(
+                configuration.GetConnectionString("LocalConnection")));
+        
+        #endregion
         
         return services;
     }
@@ -99,10 +107,16 @@ public static class DependencyInjection
         
         #endregion
         
-        #region Azure Blob Storage
+        #region Cloudinary
         
-        services.Configure<AzureBlobOptions>(configuration.GetSection("AzureBlobStorage"));
-        services.AddSingleton<IAzureBlobService, AzureBlobService>();
+        services.Configure<CloudinaryOptions>(configuration.GetSection("Cloudinary"));
+        services.AddSingleton<Cloudinary>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<CloudinaryOptions>>().Value;
+            var account = new Account(options.CloudName, options.ApiKey, options.ApiSecret);
+            return new Cloudinary(account);
+        });
+        services.AddScoped<ICloudinaryService, CloudinaryService>();
         
         #endregion
         

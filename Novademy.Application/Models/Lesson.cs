@@ -22,5 +22,4 @@ public class Lesson
     [Required]
     public Guid CourseId { get; set; }
     public Course? Course { get; set; }
-    public ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
 }

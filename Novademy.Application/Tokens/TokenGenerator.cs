@@ -21,7 +21,19 @@ public class TokenGenerator : ITokenGenerator
             new("sub", user.Username),
             new("id", user.Id.ToString()),
             new("role", user.Role!.Name),
+            new("firstName", user.FirstName),
+            new("lastName", user.LastName),
+            new("email", user.Email),
+            new("phoneNumber", user.PhoneNumber),
+            new("group", user.Group.ToString()),
+            new("sector", ((int)user.Sector).ToString()),
         };
+        
+        // Include profile picture URL if available
+        if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
+        {
+            claims.Add(new Claim("profilePictureUrl", user.ProfilePictureUrl!));
+        }
         
         var token = new JwtSecurityToken(
             issuer: _jwtOptions.Issuer,

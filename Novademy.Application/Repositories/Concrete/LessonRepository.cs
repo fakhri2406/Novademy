@@ -1,7 +1,8 @@
-using Dapper;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
-using Novademy.Application.Data.Dapper;
-using Novademy.Application.ExternalServices.AzureBlobStorage;
+using Microsoft.EntityFrameworkCore;
+using Novademy.Application.Data.EFCore;
+using Novademy.Application.ExternalServices.Cloudinary;
 using Novademy.Application.Models;
 using Novademy.Application.Repositories.Abstract;
 
@@ -9,55 +10,40 @@ namespace Novademy.Application.Repositories.Concrete;
 
 public class LessonRepository : ILessonRepository
 {
-    private readonly IDbConnectionFactory _connectionFactory;
-    private readonly IAzureBlobService _azureBlobService;
+    private readonly AppDbContext _context;
+    private readonly ICloudinaryService _cloudinaryService;
     
-    public LessonRepository(IDbConnectionFactory connectionFactory, IAzureBlobService azureBlobService)
+    public LessonRepository(AppDbContext context, ICloudinaryService cloudinaryService)
     {
-        _connectionFactory = connectionFactory;
-        _azureBlobService = azureBlobService;
+        _context = context;
+        _cloudinaryService = cloudinaryService;
     }
-    
-    #region Create
     
     public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
-        var videoUploadResult = await _azureBlobService.UploadFileAsync(video);
-        lesson.VideoUrl = videoUploadResult;
+        var videoUploadResult = await _cloudinaryService.UploadVideoAsync(video, "lessons_videos");
+        lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
         
         if (image is not null)
         {
-            var imageUploadResult = await _azureBlobService.UploadFileAsync(image);
-            lesson.ImageUrl = imageUploadResult;
+            var imageUploadResult = await _cloudinaryService.UploadImageAsync(image, "lessons_images");
+            lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
         }
-        
-        const string sql = @"
-            INSERT INTO Lessons (Id, Title, Description, 
-            VideoUrl, Order, IsFree, Transcript, 
-            ImageUrl, CreatedAt, UpdatedAt, CourseId)
-            VALUES (@Id, @Title, @Description, 
-            @VideoUrl, @Order, @IsFree, @Transcript, 
-            @ImageUrl, @CreatedAt, @UpdatedAt, @CourseId)";
-            
-        using var connection = await _connectionFactory.CreateConnectionAsync();
-        await connection.ExecuteAsync(sql, lesson);
-        
+
+        lesson.CreatedAt = DateTime.UtcNow;
+        lesson.UpdatedAt = DateTime.UtcNow;
+
+        _context.Lessons.Add(lesson);
+        await _context.SaveChangesAsync();
+
         return lesson;
     }
     
-    #endregion
-    
-    #region Read
-    
     public async Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(Guid courseId)
     {
-        const string sql = @"
-            SELECT *
-            FROM Lessons
-            WHERE CourseId = @CourseId";
-            
-        using var connection = await _connectionFactory.CreateConnectionAsync();
-        var lessons = await connection.QueryAsync<Lesson>(sql, new { CourseId = courseId });
+        var lessons = await _context.Lessons
+            .Where(l => l.CourseId == courseId)
+            .ToListAsync();
         
         if (!lessons.Any())
         {
@@ -69,14 +55,7 @@ public class LessonRepository : ILessonRepository
     
     public async Task<Lesson?> GetLessonByIdAsync(Guid id)
     {
-        const string sql = @"
-            SELECT *
-            FROM Lessons
-            WHERE Id = @Id";
-            
-        using var connection = await _connectionFactory.CreateConnectionAsync();
-        var lesson = await connection.QueryFirstOrDefaultAsync<Lesson>(sql, new { Id = id });
-        
+        var lesson = await _context.Lessons.FindAsync(id);
         if (lesson == null)
         {
             throw new KeyNotFoundException("Invalid Lesson ID.");
@@ -85,73 +64,56 @@ public class LessonRepository : ILessonRepository
         return lesson;
     }
     
-    #endregion
-    
-    #region Update
-    
     public async Task<Lesson?> UpdateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
-        var videoUploadResult = await _azureBlobService.UploadFileAsync(video);
-        lesson.VideoUrl = videoUploadResult;
+        var videoUrl = lesson.VideoUrl;
+        if (!string.IsNullOrEmpty(videoUrl))
+        {
+            await _cloudinaryService.DeleteFileAsync(videoUrl, ResourceType.Video);
+        }
+        var videoUploadResult = await _cloudinaryService.UploadVideoAsync(video, "lessons_videos");
+        lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
         
         if (image is not null)
         {
-            var imageUploadResult = await _azureBlobService.UploadFileAsync(image);
-            lesson.ImageUrl = imageUploadResult;
+            var imageUrl = lesson.ImageUrl;
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                await _cloudinaryService.DeleteFileAsync(imageUrl, ResourceType.Image);
+            }
+            var imageUploadResult = await _cloudinaryService.UploadVideoAsync(video, "lessons_images");
+            lesson.ImageUrl = imageUploadResult.SecureUrl.ToString();
         }
-        
-        const string sql = @"
-            UPDATE Lessons 
-            SET Title = @Title,
-                Description = @Description,
-                VideoUrl = @VideoUrl,
-                Order = @Order,
-                Transcript = @Transcript,
-                ImageUrl = @ImageUrl,
-                UpdatedAt = @UpdatedAt
-            WHERE Id = @Id";
-            
-        using var connection = await _connectionFactory.CreateConnectionAsync();
-        await connection.ExecuteAsync(sql, lesson);
-        
+
+        lesson.UpdatedAt = DateTime.UtcNow;
+
+        _context.Lessons.Update(lesson);
+        await _context.SaveChangesAsync();
+
         return lesson;
     }
     
-    #endregion
-    
-    #region Delete
-    
     public async Task DeleteLessonAsync(Guid id)
     {
-        const string findVideoSql = "SELECT VideoUrl FROM Lessons WHERE Id = @Id";
-        const string findImageSql = "SELECT ImageUrl FROM Lessons WHERE Id = @Id";
-        const string deleteLessonSql = "DELETE FROM Lessons WHERE Id = @Id";
-    
-        using var connection = await _connectionFactory.CreateConnectionAsync();
-        
-        var videoUrl = await connection.QueryFirstOrDefaultAsync<string>(findVideoSql, new { Id = id });
-
-        if (!string.IsNullOrEmpty(videoUrl))
-        {
-            var fileName = Path.GetFileName(new Uri(videoUrl).LocalPath);
-            await _azureBlobService.DeleteFileAsync(fileName);
-        }
-        
-        var imageUrl = await connection.QueryFirstOrDefaultAsync<string>(findImageSql, new { Id = id });
-        
-        if (!string.IsNullOrEmpty(imageUrl))
-        {
-            var fileName = Path.GetFileName(new Uri(imageUrl).LocalPath);
-            await _azureBlobService.DeleteFileAsync(fileName);
-        }
-        
-        var affectedRows = await connection.ExecuteAsync(deleteLessonSql, new { Id = id });
-
-        if (affectedRows == 0)
+        var lesson = await _context.Lessons.FindAsync(id);
+        if (lesson == null)
         {
             throw new KeyNotFoundException("Invalid Lesson ID.");
         }
+
+        var videoUrl = lesson.VideoUrl;
+        if (!string.IsNullOrEmpty(videoUrl))
+        {
+            await _cloudinaryService.DeleteFileAsync(videoUrl, ResourceType.Video);
+        }
+        
+        var imageUrl = lesson.ImageUrl;
+        if (!string.IsNullOrEmpty(imageUrl))
+        {
+            await _cloudinaryService.DeleteFileAsync(imageUrl, ResourceType.Image);
+        }
+
+        _context.Lessons.Remove(lesson);
+        await _context.SaveChangesAsync();
     }
-    
-    #endregion
 }
