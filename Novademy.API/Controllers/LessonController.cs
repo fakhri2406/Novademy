@@ -1,10 +1,9 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.API.EndPoints;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Contracts.Requests.Lesson;
-using Novademy.API.Mapping;
+using Novademy.Application.Services.Abstract;
 
 namespace Novademy.API.Controllers;
 
@@ -12,21 +11,13 @@ namespace Novademy.API.Controllers;
 [Authorize]
 public class LessonController : ControllerBase
 {
-    private readonly ILessonRepository _repo;
+    private readonly ILessonService _lessonService;
     private readonly ISubscriptionRepository _subscriptionRepo;
-    private readonly IValidator<CreateLessonRequest> _createValidator;
-    private readonly IValidator<UpdateLessonRequest> _updateValidator;
     
-    public LessonController(
-        ILessonRepository repo,
-        ISubscriptionRepository subscriptionRepo,
-        IValidator<CreateLessonRequest> createValidator,
-        IValidator<UpdateLessonRequest> updateValidator)
+    public LessonController(ILessonService lessonService, ISubscriptionRepository subscriptionRepo)
     {
-        _repo = repo;
+        _lessonService = lessonService;
         _subscriptionRepo = subscriptionRepo;
-        _createValidator = createValidator;
-        _updateValidator = updateValidator;
     }
     
     #region GET
@@ -47,8 +38,7 @@ public class LessonController : ControllerBase
     {
         try
         {
-            var lessons = await _repo.GetLessonsByCourseIdAsync(courseId);
-            var responses = lessons.Select(l => l.MapToLessonResponse());
+            var responses = await _lessonService.GetByCourseIdAsync(courseId);
             return responses.Any() ? Ok(responses) : NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -78,12 +68,12 @@ public class LessonController : ControllerBase
     {
         try
         {
-            var lesson = await _repo.GetLessonByIdAsync(id);
+            var response = await _lessonService.GetByIdAsync(id);
             
             var isAdmin = User.IsInRole("Admin");
             var isTeacher = User.IsInRole("Teacher");
             
-            if ((!isAdmin && !isTeacher) && !lesson!.IsFree)
+            if ((!isAdmin && !isTeacher) && !response.IsFree)
             {
                 var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
                 var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForLessonAsync(userId, id);
@@ -93,7 +83,6 @@ public class LessonController : ControllerBase
                 }
             }
             
-            var response = lesson!.MapToLessonResponse();
             return Ok(response);
         }
         catch (KeyNotFoundException ex)
@@ -125,14 +114,9 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateLesson([FromForm] CreateLessonRequest request)
     {
-        await _createValidator.ValidateAndThrowAsync(request);
-        
-        var lesson = request.MapToLesson();
         try
         {
-            var createdLesson = await _repo.CreateLessonAsync(lesson, request.Video, request.Image!);
-            
-            var response = createdLesson.MapToLessonResponse();
+            var response = await _lessonService.CreateAsync(request);
             return CreatedAtAction(nameof(GetLesson), new { id = response.Id },
                 $"Lesson with ID {response.Id} created successfully for Course {response.CourseId}.");
         }
@@ -163,21 +147,9 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> UpdateLesson([FromRoute] Guid id, [FromForm] UpdateLessonRequest request)
     {
-        await _updateValidator.ValidateAndThrowAsync(request);
-        
         try
         {
-            var lessonToUpdate = await _repo.GetLessonByIdAsync(id);
-            
-            lessonToUpdate!.Title = request.Title;
-            lessonToUpdate.Description = request.Description;
-            lessonToUpdate.Order = request.Order;
-            lessonToUpdate.Transcript = request.Transcript;
-            lessonToUpdate.UpdatedAt = DateTime.UtcNow;
-            
-            var updatedLesson = await _repo.UpdateLessonAsync(lessonToUpdate, request.Video, request.Image ?? null);
-            
-            var response = updatedLesson!.MapToLessonResponse();
+            var response = await _lessonService.UpdateAsync(id, request);
             return Ok(response);
         }
         catch (KeyNotFoundException ex)
@@ -212,7 +184,7 @@ public class LessonController : ControllerBase
     {
         try
         {
-            await _repo.DeleteLessonAsync(id);
+            await _lessonService.DeleteAsync(id);
             return NoContent();
         }
         catch (KeyNotFoundException ex)

@@ -1,32 +1,19 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.API.EndPoints;
-using Novademy.Application.Models;
-using Novademy.Application.Repositories.Abstract;
+using Novademy.Application.Services.Abstract;
 using Novademy.Contracts.Requests.Package;
-using Novademy.API.Mapping;
 
 namespace Novademy.API.Controllers;
 
 [ApiController]
 public class PackageController : ControllerBase
 {
-    private readonly IPackageRepository _repo;
-    private readonly ICourseRepository _courseRepo;
-    private readonly IValidator<CreatePackageRequest> _createValidator;
-    private readonly IValidator<UpdatePackageRequest> _updateValidator;
+    private readonly IPackageService _packageService;
     
-    public PackageController(
-        IPackageRepository repo,
-        ICourseRepository courseRepo,
-        IValidator<CreatePackageRequest> createValidator,
-        IValidator<UpdatePackageRequest> updateValidator)
+    public PackageController(IPackageService packageService)
     {
-        _repo = repo;
-        _courseRepo = courseRepo;
-        _createValidator = createValidator;
-        _updateValidator = updateValidator;
+        _packageService = packageService;
     }
     
     #region GET
@@ -44,8 +31,7 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPackages()
     {
-        var packages = await _repo.GetAllPackagesAsync();
-        var responses = packages.Select(p => p.MapToPackageResponse());
+        var responses = await _packageService.GetAllAsync();
         return responses.Any() ? Ok(responses) : NoContent();
     }
     
@@ -66,8 +52,7 @@ public class PackageController : ControllerBase
     {
         try
         {
-            var package = await _repo.GetPackageByIdAsync(id);
-            var response = package!.MapToPackageResponse();
+            var response = await _packageService.GetByIdAsync(id);
             return Ok(response);
         }
         catch (KeyNotFoundException ex)
@@ -100,24 +85,9 @@ public class PackageController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreatePackage([FromForm] CreatePackageRequest request)
     {
-        await _createValidator.ValidateAndThrowAsync(request);
-        
-        var package = request.MapToPackage();
         try
         {
-            package.Courses = new List<Course>();
-            foreach (var courseId in request.CourseIds)
-            {
-                var course = await _courseRepo.GetCourseByIdAsync(courseId);
-                if (course is not null)
-                {
-                    package.Courses.Add(course);
-                }
-            }
-            
-            var createdPackage = await _repo.CreatePackageAsync(package, request.Image!);
-            
-            var response = createdPackage.MapToPackageResponse();
+            var response = await _packageService.CreateAsync(request);
             return CreatedAtAction(nameof(GetPackage), new { id = response.Id },
                 $"Package with ID {response.Id} created successfully.");
         }
@@ -152,30 +122,9 @@ public class PackageController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdatePackage([FromRoute] Guid id, [FromForm] UpdatePackageRequest request)
     {
-        await _updateValidator.ValidateAndThrowAsync(request);
-        
         try
         {
-            var packageToUpdate = await _repo.GetPackageByIdAsync(id);
-            
-            packageToUpdate!.Title = request.Title;
-            packageToUpdate.Description = request.Description;
-            packageToUpdate.Price = request.Price;
-            packageToUpdate.UpdatedAt = DateTime.UtcNow;
-            
-            packageToUpdate.Courses.Clear();
-            foreach (var courseId in request.CourseIds)
-            {
-                var course = await _courseRepo.GetCourseByIdAsync(courseId);
-                if (course is not null)
-                {
-                    packageToUpdate.Courses.Add(course);
-                }
-            }
-            
-            var updatedPackage = await _repo.UpdatePackageAsync(packageToUpdate, request.Image ?? null);
-            
-            var response = updatedPackage!.MapToPackageResponse();
+            var response = await _packageService.UpdateAsync(id, request);
             return Ok(response);
         }
         catch (KeyNotFoundException ex)
@@ -210,7 +159,7 @@ public class PackageController : ControllerBase
     {
         try
         {
-            await _repo.DeletePackageAsync(id);
+            await _packageService.DeleteAsync(id);
             return NoContent();
         }
         catch (KeyNotFoundException ex)

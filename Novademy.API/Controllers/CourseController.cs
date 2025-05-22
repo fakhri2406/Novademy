@@ -1,8 +1,7 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.API.EndPoints;
-using Novademy.API.Mapping;
+using Novademy.Application.Services.Abstract;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Contracts.Requests.Course;
 
@@ -12,21 +11,13 @@ namespace Novademy.API.Controllers;
 [Authorize]
 public class CourseController : ControllerBase
 {
-    private readonly ICourseRepository _repo;
+    private readonly ICourseService _courseService;
     private readonly ISubscriptionRepository _subscriptionRepo;
-    private readonly IValidator<CreateCourseRequest> _createValidator;
-    private readonly IValidator<UpdateCourseRequest> _updateValidator;
     
-    public CourseController(
-        ICourseRepository repo,
-        ISubscriptionRepository subscriptionRepo,
-        IValidator<CreateCourseRequest> createValidator,
-        IValidator<UpdateCourseRequest> updateValidator)
+    public CourseController(ICourseService courseService, ISubscriptionRepository subscriptionRepo)
     {
-        _repo = repo;
+        _courseService = courseService;
         _subscriptionRepo = subscriptionRepo;
-        _createValidator = createValidator;
-        _updateValidator = updateValidator;
     }
     
     #region GET
@@ -45,8 +36,7 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetCourses()
     {
-        var courses = await _repo.GetAllCoursesAsync();
-        var responses = courses.Select(c => c.MapToCourseResponse());
+        var responses = await _courseService.GetAllAsync();
         return responses.Any() ? Ok(responses) : NoContent();
     }
     
@@ -67,8 +57,6 @@ public class CourseController : ControllerBase
     {
         try
         {
-            var course = await _repo.GetCourseByIdAsync(id);
-            
             var isAdmin = User.IsInRole("Admin");
             var isTeacher = User.IsInRole("Teacher");
             
@@ -82,7 +70,8 @@ public class CourseController : ControllerBase
                 }
             }
             
-            var response = course!.MapToCourseResponse();
+            var response = await _courseService.GetByIdAsync(id);
+            
             return Ok(response);
         }
         catch (KeyNotFoundException ex)
@@ -114,14 +103,9 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateCourse([FromForm] CreateCourseRequest request)
     {
-        await _createValidator.ValidateAndThrowAsync(request);
-        
-        var course = request.MapToCourse();
         try
         {
-            var createdCourse = await _repo.CreateCourseAsync(course, request.Image!);
-            
-            var response = createdCourse.MapToCourseResponse();
+            var response = await _courseService.CreateAsync(request);
             return CreatedAtAction(nameof(GetCourse), new { id = response.Id },
                 $"Course with ID {response.Id} created successfully.");
         }
@@ -152,20 +136,9 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCourse([FromRoute] Guid id, [FromForm] UpdateCourseRequest request)
     {
-        await _updateValidator.ValidateAndThrowAsync(request);
-        
         try
         {
-            var courseToUpdate = await _repo.GetCourseByIdAsync(id);
-            
-            courseToUpdate!.Title = request.Title;
-            courseToUpdate.Description = request.Description;
-            courseToUpdate.Subject = request.Subject;
-            courseToUpdate.UpdatedAt = DateTime.UtcNow;
-            
-            var updatedCourse = await _repo.UpdateCourseAsync(courseToUpdate, request.Image ?? null);
-            
-            var response = updatedCourse!.MapToCourseResponse();
+            var response = await _courseService.UpdateAsync(id, request);
             return Ok(response);
         }
         catch (KeyNotFoundException ex)
@@ -200,7 +173,7 @@ public class CourseController : ControllerBase
     {
         try
         {
-            await _repo.DeleteCourseAsync(id);
+            await _courseService.DeleteAsync(id);
             return NoContent();
         }
         catch (KeyNotFoundException ex)

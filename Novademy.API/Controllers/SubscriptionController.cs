@@ -1,9 +1,8 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.API.EndPoints;
-using Novademy.API.Mapping;
-using Novademy.Application.Repositories.Abstract;
+using System.Linq;
+using Novademy.Application.Services.Abstract;
 using Novademy.Contracts.Requests.Subscription;
 
 namespace Novademy.API.Controllers;
@@ -12,15 +11,11 @@ namespace Novademy.API.Controllers;
 [Authorize]
 public class SubscriptionController : ControllerBase
 {
-    private readonly ISubscriptionRepository _repo;
-    private readonly IValidator<SubscriptionRequest> _subscribeValidator;
+    private readonly ISubscriptionService _subscriptionService;
     
-    public SubscriptionController(
-        ISubscriptionRepository repo,
-        IValidator<SubscriptionRequest> subscribeValidator)
+    public SubscriptionController(ISubscriptionService subscriptionService)
     {
-        _repo = repo;
-        _subscribeValidator = subscribeValidator;
+        _subscriptionService = subscriptionService;
     }
     
     #region GET
@@ -41,8 +36,7 @@ public class SubscriptionController : ControllerBase
     {
         try
         {
-            var subscriptions = await _repo.GetActiveSubscriptionsByUserIdAsync(userId);
-            var responses = subscriptions.Select(s => s.MapToSubscriptionResponse());
+            var responses = await _subscriptionService.GetActiveByUserIdAsync(userId);
             return responses.Any() ? Ok(responses) : NoContent();
         }
         catch (Exception ex)
@@ -69,14 +63,9 @@ public class SubscriptionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Subscribe([FromBody] SubscriptionRequest request)
     {
-        await _subscribeValidator.ValidateAndThrowAsync(request);
-        
-        var subscription = request.MapToSubscription();
         try
         {
-            var createdSubscription = await _repo.CreateSubscriptionAsync(subscription);
-            
-            var response = createdSubscription.MapToSubscriptionResponse();
+            var response = await _subscriptionService.SubscribeAsync(request);
             return CreatedAtAction(nameof(GetActiveSubscriptions), new { userId = response.UserId },
                 $"User {response.UserId} subscribed to package {response.PackageId}.");
         }

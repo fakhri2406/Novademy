@@ -14,6 +14,8 @@ using Novademy.Application.Validators.Auth;
 using CloudinaryDotNet;
 using Microsoft.Extensions.Options;
 using Novademy.Application.ExternalServices.Email;
+using Novademy.Application.Services.Abstract;
+using Novademy.Application.Services.Concrete;
 
 namespace Novademy.Application.ServiceCollectionExtensions;
 
@@ -128,6 +130,16 @@ public static class DependencyInjection
         
         #endregion
         
+        return services;
+    }
+
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICourseService, CourseService>();
+        services.AddScoped<ILessonService, LessonService>();
+        services.AddScoped<IPackageService, PackageService>();
+        services.AddScoped<ISubscriptionService, SubscriptionService>();
         return services;
     }
 }

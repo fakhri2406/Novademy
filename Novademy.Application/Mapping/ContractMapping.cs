@@ -4,17 +4,20 @@ using Novademy.Contracts.Requests.Course;
 using Novademy.Contracts.Requests.Lesson;
 using Novademy.Contracts.Requests.Package;
 using Novademy.Contracts.Requests.Subscription;
+using Novademy.Contracts.Responses.Auth;
 using Novademy.Contracts.Responses.Course;
 using Novademy.Contracts.Responses.Lesson;
 using Novademy.Contracts.Responses.Package;
 using Novademy.Contracts.Responses.Subscription;
+using System;
+using System.IO;
+using System.Linq;
 
-namespace Novademy.API.Mapping;
+namespace Novademy.Application.Mapping;
 
 public static class ContractMapping
 {
     #region User
-    
     public static User MapToUser(this RegisterRequest request)
     {
         return new User
@@ -32,14 +35,12 @@ public static class ContractMapping
             Sector = request.Sector
         };
     }
-    
     #endregion
-    
+
     #region Course
-    
     public static Course MapToCourse(this CreateCourseRequest request)
     {
-        return new Course()
+        return new Course
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
@@ -49,10 +50,10 @@ public static class ContractMapping
             UpdatedAt = DateTime.UtcNow
         };
     }
-    
+
     public static CourseResponse MapToCourseResponse(this Course course)
     {
-        return new CourseResponse()
+        return new CourseResponse
         {
             Id = course.Id,
             Title = course.Title,
@@ -63,14 +64,12 @@ public static class ContractMapping
             UpdatedAt = course.UpdatedAt
         };
     }
-    
     #endregion
-    
+
     #region Lesson
-    
     public static Lesson MapToLesson(this CreateLessonRequest request)
     {
-        return new Lesson()
+        return new Lesson
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
@@ -83,31 +82,30 @@ public static class ContractMapping
             UpdatedAt = DateTime.UtcNow
         };
     }
-    
+
     public static LessonResponse MapToLessonResponse(this Lesson lesson)
     {
-        return new LessonResponse()
+        return new LessonResponse
         {
             Id = lesson.Id,
             Title = lesson.Title,
             Description = lesson.Description,
             VideoUrl = lesson.VideoUrl,
             Order = lesson.Order,
+            IsFree = lesson.IsFree,
             Transcript = lesson.Transcript,
             ImageUrl = lesson.ImageUrl,
             CreatedAt = lesson.CreatedAt,
             UpdatedAt = lesson.UpdatedAt,
-            CourseId = lesson.CourseId,
+            CourseId = lesson.CourseId
         };
     }
-    
     #endregion
-    
+
     #region Package
-    
     public static Package MapToPackage(this CreatePackageRequest request)
     {
-        return new Package()
+        return new Package
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
@@ -117,10 +115,10 @@ public static class ContractMapping
             UpdatedAt = DateTime.UtcNow
         };
     }
-    
+
     public static PackageResponse MapToPackageResponse(this Package package)
     {
-        return new PackageResponse()
+        return new PackageResponse
         {
             Id = package.Id,
             Title = package.Title,
@@ -129,17 +127,15 @@ public static class ContractMapping
             ImageUrl = package.ImageUrl,
             CreatedAt = package.CreatedAt,
             UpdatedAt = package.UpdatedAt,
-            CourseIds = package.Courses.Select(c => c.Id).ToList(),
+            CourseIds = package.Courses.Select(c => c.Id).ToList()
         };
     }
-    
     #endregion
-    
+
     #region Subscription
-    
     public static Subscription MapToSubscription(this SubscriptionRequest request)
     {
-        return new Subscription()
+        return new Subscription
         {
             Id = Guid.NewGuid(),
             UserId = request.UserId,
@@ -148,10 +144,10 @@ public static class ContractMapping
             EndDate = DateTime.UtcNow.AddYears(1)
         };
     }
-    
+
     public static SubscriptionResponse MapToSubscriptionResponse(this Subscription subscription)
     {
-        return new SubscriptionResponse()
+        return new SubscriptionResponse
         {
             Id = subscription.Id,
             UserId = subscription.UserId,
@@ -161,6 +157,5 @@ public static class ContractMapping
             IsActive = subscription.IsActive
         };
     }
-    
     #endregion
-}
+} 

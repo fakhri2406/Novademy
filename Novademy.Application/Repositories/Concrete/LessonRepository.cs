@@ -56,6 +56,7 @@ public class LessonRepository : ILessonRepository
     public async Task<Lesson?> GetLessonByIdAsync(Guid id)
     {
         var lesson = await _context.Lessons.FindAsync(id);
+        
         if (lesson == null)
         {
             throw new KeyNotFoundException("Invalid Lesson ID.");
