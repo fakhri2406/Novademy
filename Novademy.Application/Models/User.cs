@@ -27,6 +27,9 @@ public class User
     public string? ProfilePictureUrl { get; set; }
     public DateTime RegisteredAt { get; set; }
     public DateTime? LastLoginAt { get; set; }
+    public string? EmailVerificationCode { get; set; }
+    public DateTime? EmailVerificationExpiry { get; set; }
+    public bool IsEmailVerified { get; set; }
     [Required]
     public int RoleId { get; set; }
     public Role? Role { get; set; }

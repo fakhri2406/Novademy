@@ -51,6 +51,10 @@ public class AuthRepository : IAuthRepository
             user.ProfilePictureUrl = uploadResult.SecureUrl.ToString();
         }
         
+        user.EmailVerificationCode = new Random().Next(1000, 10000).ToString();
+        user.EmailVerificationExpiry = DateTime.UtcNow.AddMinutes(15);
+        user.IsEmailVerified = false;
+        
         user.RegisteredAt = DateTime.UtcNow;
         user.LastLoginAt = DateTime.UtcNow;
         
@@ -143,6 +147,35 @@ public class AuthRepository : IAuthRepository
         
         _context.RefreshTokens.RemoveRange(tokens);
         await _context.SaveChangesAsync();
+    }
+    
+    #endregion
+    
+    #region Get
+    
+    public async Task<User> GetUserByIdAsync(Guid userId)
+    {
+        var user = await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+        
+        if (user is null)
+        {
+            throw new KeyNotFoundException("User not found.");
+        }
+        
+        return user;
+    }
+    
+    #endregion
+    
+    #region Update
+    
+    public async Task<User> UpdateUserAsync(User user)
+    {
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+        return user;
     }
     
     #endregion

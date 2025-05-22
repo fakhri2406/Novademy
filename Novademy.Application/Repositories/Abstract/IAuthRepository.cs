@@ -11,4 +11,6 @@ public interface IAuthRepository
     Task<RefreshToken> GetRefreshTokenAsync(string token);
     Task RemoveRefreshTokenAsync(string token);
     Task RemoveAllRefreshTokensAsync(Guid userId);
+    Task<User> GetUserByIdAsync(Guid userId);
+    Task<User> UpdateUserAsync(User user);
 }

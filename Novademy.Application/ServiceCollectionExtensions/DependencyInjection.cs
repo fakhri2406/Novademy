@@ -13,6 +13,7 @@ using Novademy.Application.Tokens;
 using Novademy.Application.Validators.Auth;
 using CloudinaryDotNet;
 using Microsoft.Extensions.Options;
+using Novademy.Application.ExternalServices.Email;
 
 namespace Novademy.Application.ServiceCollectionExtensions;
 
@@ -117,6 +118,13 @@ public static class DependencyInjection
             return new Cloudinary(account);
         });
         services.AddScoped<ICloudinaryService, CloudinaryService>();
+        
+        #endregion
+        
+        #region Email
+        
+        services.Configure<EmailOptions>(configuration.GetSection("Email"));
+        services.AddSingleton<IEmailService, EmailService>();
         
         #endregion
         

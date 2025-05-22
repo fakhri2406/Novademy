@@ -42,4 +42,8 @@
       <ProjectReference Include="..\Novademy.Contracts\Novademy.Contracts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="wwwroot\EmailTemplate.html" />
+    </ItemGroup>
+
 </Project>
