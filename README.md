@@ -45,6 +45,3 @@ Novademy/
 
 - **Storage**
   - MS Azure Blob Storage (currently testing on Cloudinary)
-
-- **Hosting**
-  - Render (currently incative)
