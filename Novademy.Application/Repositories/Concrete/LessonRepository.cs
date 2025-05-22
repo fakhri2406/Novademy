@@ -45,11 +45,6 @@ public class LessonRepository : ILessonRepository
             .Where(l => l.CourseId == courseId)
             .ToListAsync();
         
-        if (!lessons.Any())
-        {
-            throw new KeyNotFoundException("Invalid Course ID.");
-        }
-        
         return lessons;
     }
     
