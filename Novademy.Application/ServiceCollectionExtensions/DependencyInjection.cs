@@ -32,6 +32,16 @@ public static class DependencyInjection
         return services;
     }
     
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICourseService, CourseService>();
+        services.AddScoped<ILessonService, LessonService>();
+        services.AddScoped<IPackageService, PackageService>();
+        services.AddScoped<ISubscriptionService, SubscriptionService>();
+        return services;
+    }
+    
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         #region Azure DB
@@ -130,16 +140,6 @@ public static class DependencyInjection
         
         #endregion
         
-        return services;
-    }
-
-    public static IServiceCollection AddServices(this IServiceCollection services)
-    {
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<ICourseService, CourseService>();
-        services.AddScoped<ILessonService, LessonService>();
-        services.AddScoped<IPackageService, PackageService>();
-        services.AddScoped<ISubscriptionService, SubscriptionService>();
         return services;
     }
 }
