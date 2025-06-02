@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.API.EndPoints;
 using Novademy.Contracts.Requests.Auth;
@@ -168,6 +169,39 @@ public class AuthController : ControllerBase
         {
             await _authService.LogoutAsync(id);
             return Ok("User logged out.");
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    #endregion
+
+    #region Get Current User
+    
+    /// <summary>
+    /// Get the current user's information
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route(ApiEndPoints.Auth.GetCurrentUser)]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        try
+        {
+            var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
+            var user = await _authService.GetUserByIdAsync(userId);
+            return Ok(user);
         }
         catch (KeyNotFoundException ex)
         {

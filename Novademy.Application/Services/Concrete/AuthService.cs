@@ -143,4 +143,14 @@ public class AuthService : IAuthService
     {
         await _repo.RemoveAllRefreshTokensAsync(userId);
     }
+
+    public async Task<User> GetUserByIdAsync(Guid userId)
+    {
+        var user = await _repo.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"User with ID {userId} not found.");
+        }
+        return user;
+    }
 } 
