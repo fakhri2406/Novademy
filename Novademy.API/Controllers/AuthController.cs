@@ -3,17 +3,21 @@ using Microsoft.AspNetCore.Mvc;
 using Novademy.API.EndPoints;
 using Novademy.Contracts.Requests.Auth;
 using Novademy.Application.Services.Abstract;
+using Microsoft.Extensions.Logging;
 
 namespace Novademy.API.Controllers;
 
 [ApiController]
+[Route("api/v1/auth")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
     
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
         _authService = authService;
+        _logger = logger;
     }
     
     #region Register
@@ -23,8 +27,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost]
-    [Route(ApiEndPoints.Auth.Register)]
+    [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -56,8 +59,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost]
-    [Route(ApiEndPoints.Auth.Login)]
+    [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -88,8 +90,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost]
-    [Route(ApiEndPoints.Auth.VerifyEmail)]
+    [HttpPost("verify-email")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -120,8 +121,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost]
-    [Route(ApiEndPoints.Auth.Refresh)]
+    [HttpPost("refresh")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -157,8 +157,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost]
-    [Route(ApiEndPoints.Auth.Logout)]
+    [HttpPost("logout/{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -188,8 +187,7 @@ public class AuthController : ControllerBase
     /// Get the current user's information
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
-    [Route(ApiEndPoints.Auth.GetCurrentUser)]
+    [HttpGet("me")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -199,18 +197,45 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
+            // Add debug logging
+            _logger.LogInformation("GetCurrentUser endpoint called");
+            _logger.LogInformation("User claims: {@Claims}", User.Claims.Select(c => new { c.Type, c.Value }));
+            
+            var userIdClaim = User.FindFirst("id");
+            if (userIdClaim == null)
+            {
+                _logger.LogWarning("User ID claim not found in token");
+                return Unauthorized("User ID claim not found in token");
+            }
+            
+            var userId = Guid.Parse(userIdClaim.Value);
+            _logger.LogInformation("User ID from token: {UserId}", userId);
+            
             var user = await _authService.GetUserByIdAsync(userId);
             return Ok(user);
         }
         catch (KeyNotFoundException ex)
         {
+            _logger.LogWarning(ex, "User not found");
             return NotFound(ex.Message);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error getting current user");
             return BadRequest(ex.Message);
         }
+    }
+    
+    /// <summary>
+    /// Test endpoint to verify routing and authentication
+    /// </summary>
+    [HttpGet("test-auth")]
+    [Authorize]
+    public IActionResult TestAuth()
+    {
+        _logger.LogInformation("TestAuth endpoint called");
+        _logger.LogInformation("User claims: {@Claims}", User.Claims.Select(c => new { c.Type, c.Value }));
+        return Ok(new { message = "Authentication successful", claims = User.Claims.Select(c => new { c.Type, c.Value }) });
     }
     
     #endregion
