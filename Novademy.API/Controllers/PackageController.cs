@@ -50,19 +50,8 @@ public class PackageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPackage([FromRoute] Guid id)
     {
-        try
-        {
-            var response = await _packageService.GetByIdAsync(id);
-            return Ok(response);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _packageService.GetByIdAsync(id);
+        return Ok(response);
     }
 
     #endregion
@@ -85,20 +74,9 @@ public class PackageController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreatePackage([FromForm] CreatePackageRequest request)
     {
-        try
-        {
-            var response = await _packageService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetPackage), new { id = response.Id },
-                $"Package with ID {response.Id} created successfully.");
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _packageService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetPackage), new { id = response.Id },
+            $"Package with ID {response.Id} created successfully.");
     }
     
     #endregion
@@ -122,19 +100,8 @@ public class PackageController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdatePackage([FromRoute] Guid id, [FromForm] UpdatePackageRequest request)
     {
-        try
-        {
-            var response = await _packageService.UpdateAsync(id, request);
-            return Ok(response);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _packageService.UpdateAsync(id, request);
+        return Ok(response);
     }
     
     #endregion
@@ -157,19 +124,8 @@ public class PackageController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePackage([FromRoute] Guid id)
     {
-        try
-        {
-            await _packageService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _packageService.DeleteAsync(id);
+        return NoContent();
     }
     
     #endregion

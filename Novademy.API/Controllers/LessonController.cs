@@ -36,19 +36,8 @@ public class LessonController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetLessons([FromRoute] Guid courseId)
     {
-        try
-        {
-            var responses = await _lessonService.GetByCourseIdAsync(courseId);
-            return responses.Any() ? Ok(responses) : NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var responses = await _lessonService.GetByCourseIdAsync(courseId);
+        return responses.Any() ? Ok(responses) : NoContent();
     }
     
     /// <summary>
@@ -66,33 +55,22 @@ public class LessonController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetLesson([FromRoute] Guid id)
     {
-        try
+        var response = await _lessonService.GetByIdAsync(id);
+        
+        var isAdmin = User.IsInRole("Admin");
+        var isTeacher = User.IsInRole("Teacher");
+        
+        if ((!isAdmin && !isTeacher) && !response.IsFree)
         {
-            var response = await _lessonService.GetByIdAsync(id);
-            
-            var isAdmin = User.IsInRole("Admin");
-            var isTeacher = User.IsInRole("Teacher");
-            
-            if ((!isAdmin && !isTeacher) && !response.IsFree)
+            var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
+            var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForLessonAsync(userId, id);
+            if (!hasAccess)
             {
-                var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
-                var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForLessonAsync(userId, id);
-                if (!hasAccess)
-                {
-                    return Forbid("You do not have access to this lesson.");
-                }
+                return Forbid("You do not have access to this lesson.");
             }
-            
-            return Ok(response);
         }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        
+        return Ok(response);
     }
     
     #endregion
@@ -114,16 +92,9 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> CreateLesson([FromForm] CreateLessonRequest request)
     {
-        try
-        {
-            var response = await _lessonService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetLesson), new { id = response.Id },
-                $"Lesson with ID {response.Id} created successfully for Course {response.CourseId}.");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _lessonService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetLesson), new { id = response.Id },
+            $"Lesson with ID {response.Id} created successfully for Course {response.CourseId}.");
     }
     
     #endregion
@@ -147,19 +118,8 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> UpdateLesson([FromRoute] Guid id, [FromForm] UpdateLessonRequest request)
     {
-        try
-        {
-            var response = await _lessonService.UpdateAsync(id, request);
-            return Ok(response);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _lessonService.UpdateAsync(id, request);
+        return Ok(response);
     }
     
     #endregion
@@ -182,19 +142,8 @@ public class LessonController : ControllerBase
     [Authorize(Roles = "Admin,Teacher")]
     public async Task<IActionResult> DeleteLesson([FromRoute] Guid id)
     {
-        try
-        {
-            await _lessonService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _lessonService.DeleteAsync(id);
+        return NoContent();
     }
     
     #endregion

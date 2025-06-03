@@ -25,15 +25,15 @@ public class GlobalExceptionMiddleware
             _logger.LogWarning(ex, "Not Found");
             await HandleExceptionAsync(context, ex.Message, StatusCodes.Status404NotFound);
         }
-        catch (ArgumentException ex)
-        {
-            _logger.LogWarning(ex, "Invalid Argument");
-            await HandleExceptionAsync(context, ex.Message, StatusCodes.Status400BadRequest);
-        }
         catch (UnauthorizedAccessException ex)
         {
             _logger.LogWarning(ex, "Access Denied");
             await HandleExceptionAsync(context, ex.Message, StatusCodes.Status401Unauthorized);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid Argument");
+            await HandleExceptionAsync(context, ex.Message, StatusCodes.Status409Conflict);
         }
         catch (Exception ex)
         {

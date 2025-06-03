@@ -3,12 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Novademy.API.EndPoints;
 using Novademy.Contracts.Requests.Auth;
 using Novademy.Application.Services.Abstract;
-using Microsoft.Extensions.Logging;
 
 namespace Novademy.API.Controllers;
 
 [ApiController]
-[Route("api/v1/auth")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -27,27 +25,17 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("register")]
+    [HttpPost]
+    [Route(ApiEndPoints.Auth.Register)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Register([FromForm] RegisterRequest request)
     {
-        try
-        {
-            var userId = await _authService.RegisterAsync(request);
-            return CreatedAtAction(nameof(Register), new { id = userId },
-                $"User with ID {userId} registered successfully.");
-        }
-        catch (ArgumentException ex)
-        {
-            return Conflict(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var userId = await _authService.RegisterAsync(request);
+        return CreatedAtAction(nameof(Register), new { id = userId },
+            $"User with ID {userId} registered successfully.");
     }
     
     #endregion
@@ -59,26 +47,16 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("login")]
+    [HttpPost]
+    [Route(ApiEndPoints.Auth.Login)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromForm] LoginRequest request)
     {
-        try
-        {
-            var response = await _authService.LoginAsync(request);
-            return Ok(response);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _authService.LoginAsync(request);
+        return Ok(response);
     }
     
     #endregion
@@ -90,26 +68,16 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("verify-email")]
+    [HttpPost]
+    [Route(ApiEndPoints.Auth.VerifyEmail)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
     {
-        try
-        {
-            await _authService.VerifyEmailAsync(request);
-            return Ok();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _authService.VerifyEmailAsync(request);
+        return Ok();
     }
     
     #endregion
@@ -121,7 +89,8 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("refresh")]
+    [HttpPost]
+    [Route(ApiEndPoints.Auth.Refresh)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -129,23 +98,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
     {
-        try
-        {
-            var response = await _authService.RefreshAsync(request);
-            return Ok(response);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _authService.RefreshAsync(request);
+        return Ok(response);
     }
     
     #endregion
@@ -157,37 +111,28 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("logout/{id:guid}")]
+    [HttpPost]
+    [Route(ApiEndPoints.Auth.Logout)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Logout([FromRoute] Guid id)
     {
-        try
-        {
-            await _authService.LogoutAsync(id);
-            return Ok("User logged out.");
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _authService.LogoutAsync(id);
+        return Ok("User logged out.");
     }
     
     #endregion
-
+    
     #region Get Current User
     
     /// <summary>
     /// Get the current user's information
     /// </summary>
     /// <returns></returns>
-    [HttpGet("me")]
+    [HttpGet]
+    [Route(ApiEndPoints.Auth.GetCurrentUser)]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -195,35 +140,21 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetCurrentUser()
     {
-        try
+        _logger.LogInformation("GetCurrentUser endpoint called");
+        _logger.LogInformation("User claims: {@Claims}", User.Claims.Select(c => new { c.Type, c.Value }));
+        
+        var userIdClaim = User.FindFirst("id");
+        if (userIdClaim == null)
         {
-            // Add debug logging
-            _logger.LogInformation("GetCurrentUser endpoint called");
-            _logger.LogInformation("User claims: {@Claims}", User.Claims.Select(c => new { c.Type, c.Value }));
-            
-            var userIdClaim = User.FindFirst("id");
-            if (userIdClaim == null)
-            {
-                _logger.LogWarning("User ID claim not found in token");
-                return Unauthorized("User ID claim not found in token");
-            }
-            
-            var userId = Guid.Parse(userIdClaim.Value);
-            _logger.LogInformation("User ID from token: {UserId}", userId);
-            
-            var user = await _authService.GetUserByIdAsync(userId);
-            return Ok(user);
+            _logger.LogWarning("User ID claim not found in token");
+            return Unauthorized("User ID claim not found in token");
         }
-        catch (KeyNotFoundException ex)
-        {
-            _logger.LogWarning(ex, "User not found");
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting current user");
-            return BadRequest(ex.Message);
-        }
+        
+        var userId = Guid.Parse(userIdClaim.Value);
+        _logger.LogInformation("User ID from token: {UserId}", userId);
+            
+        var user = await _authService.GetUserByIdAsync(userId);
+        return Ok(user);
     }
     
     /// <summary>

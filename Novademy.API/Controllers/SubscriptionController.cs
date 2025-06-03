@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Novademy.API.EndPoints;
-using System.Linq;
 using Novademy.Application.Services.Abstract;
 using Novademy.Contracts.Requests.Subscription;
 
@@ -34,15 +33,8 @@ public class SubscriptionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetActiveSubscriptions([FromRoute] Guid userId)
     {
-        try
-        {
-            var responses = await _subscriptionService.GetActiveByUserIdAsync(userId);
-            return responses.Any() ? Ok(responses) : NoContent();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var responses = await _subscriptionService.GetActiveByUserIdAsync(userId);
+        return responses.Any() ? Ok(responses) : NoContent();
     }
     
     #endregion
@@ -63,20 +55,9 @@ public class SubscriptionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Subscribe([FromBody] SubscriptionRequest request)
     {
-        try
-        {
-            var response = await _subscriptionService.SubscribeAsync(request);
-            return CreatedAtAction(nameof(GetActiveSubscriptions), new { userId = response.UserId },
-                $"User {response.UserId} subscribed to package {response.PackageId}.");
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _subscriptionService.SubscribeAsync(request);
+        return CreatedAtAction(nameof(GetActiveSubscriptions), new { userId = response.UserId },
+            $"User {response.UserId} subscribed to package {response.PackageId}.");
     }
 
     #endregion

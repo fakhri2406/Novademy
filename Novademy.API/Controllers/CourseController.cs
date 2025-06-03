@@ -55,33 +55,22 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetCourse([FromRoute] Guid id)
     {
-        try
+        var isAdmin = User.IsInRole("Admin");
+        var isTeacher = User.IsInRole("Teacher");
+        
+        if (!isAdmin && !isTeacher)
         {
-            var isAdmin = User.IsInRole("Admin");
-            var isTeacher = User.IsInRole("Teacher");
-            
-            if (!isAdmin && !isTeacher)
+            var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
+            var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForCourseAsync(userId, id);
+            if (!hasAccess)
             {
-                var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
-                var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForCourseAsync(userId, id);
-                if (!hasAccess)
-                {
-                    return Forbid("You do not have access to this course.");
-                }
+                return Forbid("You do not have access to this course.");
             }
-            
-            var response = await _courseService.GetByIdAsync(id);
-            
-            return Ok(response);
         }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        
+        var response = await _courseService.GetByIdAsync(id);
+        
+        return Ok(response);
     }
     
     #endregion
@@ -103,16 +92,9 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateCourse([FromForm] CreateCourseRequest request)
     {
-        try
-        {
-            var response = await _courseService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetCourse), new { id = response.Id },
-                $"Course with ID {response.Id} created successfully.");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _courseService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetCourse), new { id = response.Id },
+            $"Course with ID {response.Id} created successfully.");
     }
     
     #endregion
@@ -136,19 +118,8 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCourse([FromRoute] Guid id, [FromForm] UpdateCourseRequest request)
     {
-        try
-        {
-            var response = await _courseService.UpdateAsync(id, request);
-            return Ok(response);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var response = await _courseService.UpdateAsync(id, request);
+        return Ok(response);
     }
     
     #endregion
@@ -171,19 +142,8 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteCourse([FromRoute] Guid id)
     {
-        try
-        {
-            await _courseService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _courseService.DeleteAsync(id);
+        return NoContent();
     }
     
     #endregion
