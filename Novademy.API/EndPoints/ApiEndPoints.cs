@@ -13,6 +13,7 @@ public class ApiEndPoints
         public const string VerifyEmail = $"{BaseUrl}/verify-email";
         public const string Refresh = $"{BaseUrl}/refresh";
         public const string Logout = $"{BaseUrl}/logout/{{id::guid}}";
+        public const string GetCurrentUser = $"{BaseUrl}/me";
     }
     
     public static class Course
