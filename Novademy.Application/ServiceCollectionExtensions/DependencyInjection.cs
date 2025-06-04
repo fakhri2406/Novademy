@@ -14,6 +14,7 @@ using Novademy.Application.Validators.Auth;
 using CloudinaryDotNet;
 using Microsoft.Extensions.Options;
 using Novademy.Application.ExternalServices.Email;
+using Novademy.Application.ExternalServices.OpenAI;
 using Novademy.Application.Services.Abstract;
 using Novademy.Application.Services.Concrete;
 
@@ -137,6 +138,14 @@ public static class DependencyInjection
         
         services.Configure<EmailOptions>(configuration.GetSection("Email"));
         services.AddSingleton<IEmailService, EmailService>();
+        
+        #endregion
+        
+        #region OpenAI
+        
+        services.Configure<OpenAIOptions>(configuration.GetSection("OpenAI"));
+        services.AddHttpClient();
+        services.AddSingleton<IOpenAIService, OpenAIService>();
         
         #endregion
         
