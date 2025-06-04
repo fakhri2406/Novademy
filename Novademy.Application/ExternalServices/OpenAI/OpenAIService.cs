@@ -33,7 +33,7 @@ public class OpenAIService : IOpenAIService
                 new { role = "system", content = prompt },
                 new { role = "user", content = question }
             },
-            max_tokens = 150
+            max_tokens = 300
         };
         
         var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
