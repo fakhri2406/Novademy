@@ -38,7 +38,7 @@ public class GlobalExceptionMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected Error");
-            await HandleExceptionAsync(context, "An unexpected error occurred.", StatusCodes.Status400BadRequest);
+            await HandleExceptionAsync(context, ex.Message, StatusCodes.Status400BadRequest);
         }
     }
     

@@ -56,4 +56,11 @@ public class ApiEndPoints
         public const string GetActiveSubscriptions = $"{BaseUrl}/active/{{userId::guid}}";
         public const string Subscribe = $"{BaseUrl}";
     }
+
+    public static class OpenAI
+    {
+        private const string BaseUrl = $"{ApiBaseUrl}/openai";
+        
+        public const string Ask = BaseUrl + "/ask";
+    }
 }
