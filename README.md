@@ -16,7 +16,7 @@ We provide a comprehensive suite of courses, interactive lessons, and quizzes ta
 
 ### 🚀 Built for Excellence
 
-**Novademy** is powered by a robust **.NET 8.0** backend. It uses **ASP.NET Core** for high-performance APIs, **EF Core** for interactions with **MS Azure** SQL Server.
+**Novademy** is powered by a robust **.NET 8.0** backend. It uses **ASP.NET Core** for high-performance APIs, **EF Core** for interactions with **MS Azure** SQL Server. The API is hosted on **Koyeb** and the documentation is available on https://novademy.koyeb.app/swagger/index.html.
 
 ## 🏗️ Project Structure
 
@@ -43,4 +43,8 @@ Novademy/
   - MS Azure SQL Server
 
 - **Storage**
-  - MS Azure Blob Storage (currently testing on Cloudinary)
+  - Cloudinary
+ 
+- **Hosting**
+  - Koyeb
+
