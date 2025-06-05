@@ -16,7 +16,7 @@ We provide a comprehensive suite of courses, interactive lessons, and quizzes ta
 
 ### 🚀 Built for Excellence
 
-**Novademy** is powered by a robust **.NET 8.0** backend. It uses **ASP.NET Core** for high-performance APIs, **EF Core** for database migrations and **Dapper** for fast interactions with **MS Azure** SQL Server.
+**Novademy** is powered by a robust **.NET 8.0** backend. It uses **ASP.NET Core** for high-performance APIs, **EF Core** for database migrations and **Dapper** for fast interactions with **MS Azure** SQL Server. All user requests are logged using **Serilog**.
 
 ## 🏗️ Project Structure
 
