@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
 using Novademy.API.Middlewares;
 using Novademy.Application.ServiceCollectionExtensions;
-using Microsoft.AspNetCore.Routing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,27 +107,8 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
-// Add route debugging middleware
-app.Use(async (context, next) =>
-{
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("Request path: {Path}", context.Request.Path);
-    logger.LogInformation("Request method: {Method}", context.Request.Method);
-    logger.LogInformation("Request headers: {@Headers}", context.Request.Headers);
-    
-    // Log all registered routes
-    var endpointDataSource = context.RequestServices.GetRequiredService<EndpointDataSource>();
-    var endpoints = endpointDataSource.Endpoints;
-    logger.LogInformation("Registered endpoints: {@Endpoints}", 
-        endpoints.Select(e => new { 
-            Path = e.DisplayName,
-            Metadata = e.Metadata.Select(m => m.GetType().Name)
-        }));
-    
-    await next();
-});
-
-app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();

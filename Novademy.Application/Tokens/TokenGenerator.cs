@@ -29,7 +29,6 @@ public class TokenGenerator : ITokenGenerator
             new("sector", ((int)user.Sector).ToString()),
         };
         
-        // Include profile picture URL if available
         if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
         {
             claims.Add(new Claim("profilePictureUrl", user.ProfilePictureUrl!));
