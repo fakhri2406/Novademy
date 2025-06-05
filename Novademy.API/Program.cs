@@ -1,7 +1,5 @@
 using System.Reflection;
 using System.Threading.RateLimiting;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
@@ -67,17 +65,6 @@ builder.Services.AddSwaggerGen(options =>
     
     #endregion
 });
-
-#region Key Vault
-
-var keyVaultName = builder.Configuration["KeyVaultName"]!;
-var keyVaultUri = $"https://{keyVaultName}.vault.azure.net/";
-builder.Configuration.AddAzureKeyVault(
-    new Uri(keyVaultUri),
-    new DefaultAzureCredential(),
-    new AzureKeyVaultConfigurationOptions());
-
-#endregion
 
 #region CORS
 
