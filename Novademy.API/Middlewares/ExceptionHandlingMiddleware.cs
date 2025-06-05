@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Novademy.API.Middlewares;
 
-public class GlobalExceptionMiddleware
+public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<GlobalExceptionMiddleware> _logger;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
     
-    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
         _logger = logger;
@@ -42,8 +42,14 @@ public class GlobalExceptionMiddleware
         }
     }
     
-    private static Task HandleExceptionAsync(HttpContext context, string message, int statusCode)
+    private static async Task HandleExceptionAsync(HttpContext context, string message, int statusCode)
     {
+        if (context.Response.HasStarted)
+        {
+            return;
+        }
+        
+        context.Response.Clear();
         context.Response.ContentType = "application/problem+json";
         context.Response.StatusCode = statusCode;
         
@@ -56,6 +62,6 @@ public class GlobalExceptionMiddleware
         };
         
         var result = JsonSerializer.Serialize(problemDetails);
-        return context.Response.WriteAsync(result);
+        await context.Response.WriteAsync(result);
     }
 }
