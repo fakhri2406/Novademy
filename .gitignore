@@ -44,9 +44,10 @@ _ReSharper*/
 ScaffoldingReadMe.txt
 
 # ====================
-# Development App Settings
+# Development
 # ====================
 appsettings.Development.json
+Logs/
 
 # ====================
 # Frontend Dependencies

@@ -7,8 +7,21 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
 using Novademy.API.Middlewares;
 using Novademy.Application.ServiceCollectionExtensions;
+using Serilog;
+
+#region Serilog
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/logs-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+#endregion
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 
@@ -57,7 +70,7 @@ builder.Services.AddSwaggerGen(options =>
 
 #region Key Vault
 
-string keyVaultName = builder.Configuration["KeyVaultName"]!;
+var keyVaultName = builder.Configuration["KeyVaultName"]!;
 var keyVaultUri = $"https://{keyVaultName}.vault.azure.net/";
 builder.Configuration.AddAzureKeyVault(
     new Uri(keyVaultUri),
@@ -122,4 +135,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGet("/ping", () => "pong");
+
 app.Run();

@@ -14,19 +14,25 @@ public class RequestLoggingMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         var request = context.Request;
+        var ip = context.Connection.RemoteIpAddress?.ToString();
         
-        _logger.LogInformation("Incoming Request: {method} {path} from {ip}",
-            request.Method,
-            request.Path,
-            context.Connection.RemoteIpAddress?.ToString());
-        
-        _logger.LogInformation("Request Headers: {headers}", context.Request.Headers);
+        _logger.LogInformation("Incoming Request {@RequestInfo}",
+            new
+            {
+                Method = request.Method,
+                Path = request.Path,
+                IP = ip,
+                Headers = request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString())
+            });
         
         await _next(context);
         
-        _logger.LogInformation("Outgoing Response: {statusCode} for {method} {path}",
-            context.Response.StatusCode,
-            request.Method,
-            request.Path);
+        _logger.LogInformation("Outgoing Response {@ResponseInfo}",
+            new
+            {
+                StatusCode = context.Response.StatusCode,
+                Method = request.Method,
+                Path = request.Path
+            });
     }
 }
