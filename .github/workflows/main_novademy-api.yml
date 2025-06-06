@@ -32,11 +32,11 @@ jobs:
       - name: Publish project
         run: dotnet publish Novademy.API/Novademy.API.csproj -c Release -o published
 
-      - name: Upload artifact for deployment
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: novademy-api-artifact
-          path: published
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: ubuntu-latest
