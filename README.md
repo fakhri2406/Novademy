@@ -42,9 +42,6 @@ Novademy/
 - **Database**
   - MS Azure SQL Server
 
-- **Storage**
-  - Cloudinary
- 
 - **Hosting**
-  - Koyeb
+  - MS Azure Web App
 
