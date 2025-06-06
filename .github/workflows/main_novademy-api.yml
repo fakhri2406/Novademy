@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - novademy-api
 
 on:
@@ -13,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -24,19 +21,19 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Restore dependencies
-        run: dotnet restore Novademy.API/Novademy.API.csproj
+        run: dotnet restore Novademy/Novademy.API/Novademy.API.csproj
 
-      - name: Build project
-        run: dotnet build Novademy.API/Novademy.API.csproj --configuration Release --no-restore
-        
-      - name: Publish project
-        run: dotnet publish Novademy.API/Novademy.API.csproj -c Release -o published
+      - name: Build
+        run: dotnet build Novademy/Novademy.API/Novademy.API.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish Novademy/Novademy.API/Novademy.API.csproj -c Release -o ./publish
 
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: novademy-api-artifact
-          path: published
+          name: novademy-api
+          path: ./publish
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,21 +42,22 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: novademy-api-artifact
+          name: novademy-api
+          path: ./publish
 
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D352E29687574A6CBDEBB30C565F16B6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BE63E5DD10014AB18470661F035FA8B9 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6825A914795A4106B6B8945D64CA85D8 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -67,4 +65,4 @@ jobs:
         with:
           app-name: 'novademy-api'
           slot-name: 'Production'
-          package: .
+          package: ./publish
