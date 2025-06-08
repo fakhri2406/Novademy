@@ -30,7 +30,7 @@ public static class ContractMapping
             LastName = request.LastName,
             Email = request.Email,
             PhoneNumber = "+994" + request.PhoneNumber,
-            RoleId = request.RoleId,
+            RoleId = 3,
             Group = request.Group,
             Sector = request.Sector
         };

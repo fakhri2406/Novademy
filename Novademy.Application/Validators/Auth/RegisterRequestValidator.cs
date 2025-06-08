@@ -30,8 +30,5 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage("Phone number is required.")
             .Matches(@"^0?\d{9}$").WithMessage("Phone number must be 9 or 10 digits, optionally starting with 0.");
-        
-        RuleFor(x => x.RoleId)
-            .InclusiveBetween(1, 3).WithMessage("RoleId must be between 1 and 3 (1=Admin, 2=Teacher, 3=Student).");
     }
 }
