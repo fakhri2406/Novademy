@@ -1,5 +1,5 @@
-using System.Net;
-using System.Net.Mail;
+using Azure;
+using Azure.Communication.Email;
 using Microsoft.Extensions.Options;
 
 namespace Novademy.Application.ExternalServices.Email;
@@ -7,30 +7,30 @@ namespace Novademy.Application.ExternalServices.Email;
 public class EmailService : IEmailService
 {
     private readonly EmailOptions _options;
+    private readonly EmailClient _emailClient;
     
     public EmailService(IOptions<EmailOptions> options)
     {
         _options = options.Value;
+        _emailClient = new EmailClient(_options.ConnectionString);
     }
     
     public async Task SendEmailAsync(string to, string subject, string body, bool isHtml = false)
     {
-        using var client = new SmtpClient(_options.Host, _options.Port)
-        {
-            Credentials = new NetworkCredential(_options.Username, _options.Password),
-            EnableSsl = _options.EnableSSL
-        };
-    
-        using var mailMessage = new MailMessage
-        {
-            From = new MailAddress(_options.Username),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = isHtml
-        };
+        var content = isHtml
+            ? new EmailContent(subject) { Html = body }
+            : new EmailContent(subject) { PlainText = body };
         
-        mailMessage.To.Add(to);
+        var message = new EmailMessage(
+            senderAddress: _options.FromAddress,
+            recipientAddress: to,
+            content: content
+        );
         
-        await client.SendMailAsync(mailMessage);
+        await _emailClient.SendAsync(
+            WaitUntil.Completed,
+            message,
+            CancellationToken.None
+        );
     }
 }
