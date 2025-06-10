@@ -1,6 +1,6 @@
 ## Novademy
 
-Welcome to **Novademy**, a transformative online education platform crafted for Azerbaijani students preparing for their academic exams. Our mission is to democratize access to high-quality education, empowering every student in Azerbaijan with the tools, resources, and support they need to excel. By blending technology with an understanding of local educational needs, **Novademy** offers an intuitive, affordable, and engaging learning experience.
+Welcome to **Novademy**, a transformative online education platform crafted for Azerbaijani students preparing for their academic exams. Our mission is to democratize access to high-quality education, empowering every student in Azerbaijan with the tools, resources, and support they need to excel. By blending technology with an understanding of local educational needs, **Novademy** offers an intuitive, affordable, and engaging learning experience. The project is now available at [novademy.az](https://novademy.az).
 
 ### 🌟 Why Novademy?
 
@@ -44,4 +44,3 @@ Novademy/
 
 - **Hosting**
   - MS Azure Web App
-
