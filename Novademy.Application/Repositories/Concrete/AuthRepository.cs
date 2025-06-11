@@ -21,7 +21,7 @@ public class AuthRepository : IAuthRepository
     
     #region Register
     
-    public async Task<User> RegisterUserAsync(User user, IFormFile? profilePicture)
+    public async Task<User> RegisterAsync(User user, IFormFile? profilePicture)
     {
         if (await _context.Users.AnyAsync(u => u.Username == user.Username))
         {
@@ -68,7 +68,7 @@ public class AuthRepository : IAuthRepository
     
     #region Login
     
-    public async Task<User> LoginUserAsync(string username, string password)
+    public async Task<User> LoginAsync(string username, string password)
     {
         var user = await _context.Users
             .Include(u => u.Role)

@@ -22,46 +22,62 @@ public class CourseService : ICourseService
         _createValidator = createValidator;
         _updateValidator = updateValidator;
     }
-
-    public async Task<IEnumerable<CourseResponse>> GetAllAsync()
-    {
-        var courses = await _repo.GetAllCoursesAsync();
-        return courses.Select(c => c.MapToCourseResponse());
-    }
-
-    public async Task<CourseResponse> GetByIdAsync(Guid id)
-    {
-        var course = await _repo.GetCourseByIdAsync(id);
-        return course.MapToCourseResponse();
-    }
-
+    
+    #region Create
+    
     public async Task<CourseResponse> CreateAsync(CreateCourseRequest request)
     {
         await _createValidator.ValidateAndThrowAsync(request);
         
         var course = request.MapToCourse();
-        var created = await _repo.CreateCourseAsync(course, request.Image);
+        var created = await _repo.CreateAsync(course, request.Image);
         
         return created.MapToCourseResponse();
     }
+    
+    #endregion
+    
+    #region Read
+
+    public async Task<IEnumerable<CourseResponse>> GetAllAsync()
+    {
+        var courses = await _repo.GetAllAsync();
+        return courses.Select(c => c.MapToCourseResponse());
+    }
+
+    public async Task<CourseResponse> GetByIdAsync(Guid id)
+    {
+        var course = await _repo.GetByIdAsync(id);
+        return course.MapToCourseResponse();
+    }
+    
+    #endregion
+    
+    #region Update
 
     public async Task<CourseResponse> UpdateAsync(Guid id, UpdateCourseRequest request)
     {
         await _updateValidator.ValidateAndThrowAsync(request);
         
-        var courseToUpdate = await _repo.GetCourseByIdAsync(id);
+        var courseToUpdate = await _repo.GetByIdAsync(id);
         
         courseToUpdate.Title = request.Title;
         courseToUpdate.Description = request.Description;
         courseToUpdate.Subject = request.Subject;
         courseToUpdate.UpdatedAt = DateTime.UtcNow;
         
-        var updated = await _repo.UpdateCourseAsync(courseToUpdate, request.Image);
+        var updated = await _repo.UpdateAsync(courseToUpdate, request.Image);
         return updated.MapToCourseResponse();
     }
+    
+    #endregion
+    
+    #region Delete
 
     public async Task DeleteAsync(Guid id)
     {
-        await _repo.DeleteCourseAsync(id);
+        await _repo.DeleteAsync(id);
     }
+    
+    #endregion
 } 

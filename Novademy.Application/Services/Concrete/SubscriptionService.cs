@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentValidation;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Mapping;
@@ -25,7 +22,7 @@ public class SubscriptionService : ISubscriptionService
 
     public async Task<IEnumerable<SubscriptionResponse>> GetActiveByUserIdAsync(Guid userId)
     {
-        var subscriptions = await _repo.GetActiveSubscriptionsByUserIdAsync(userId);
+        var subscriptions = await _repo.GetActiveByUserIdAsync(userId);
         return subscriptions.Select(s => s.MapToSubscriptionResponse());
     }
 
@@ -34,7 +31,7 @@ public class SubscriptionService : ISubscriptionService
         await _subscribeValidator.ValidateAndThrowAsync(request);
         
         var subscription = request.MapToSubscription();
-        var created = await _repo.CreateSubscriptionAsync(subscription);
+        var created = await _repo.CreateAsync(subscription);
         
         return created.MapToSubscriptionResponse();
     }

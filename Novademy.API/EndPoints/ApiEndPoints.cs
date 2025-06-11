@@ -4,6 +4,8 @@ public class ApiEndPoints
 {
     private const string ApiBaseUrl = "api/v1";
     
+    #region Auth
+    
     public static class Auth
     {
         private const string BaseUrl = $"{ApiBaseUrl}/auth";
@@ -16,6 +18,10 @@ public class ApiEndPoints
         public const string GetCurrentUser = $"{BaseUrl}/me";
     }
     
+    #endregion
+    
+    #region User
+    
     public static class User
     {
         private const string BaseUrl = $"{ApiBaseUrl}/user";
@@ -25,6 +31,10 @@ public class ApiEndPoints
         public const string UpdateUser = $"{BaseUrl}/{{id::guid}}";
         public const string DeleteUser = $"{BaseUrl}/{{id::guid}}";
     }
+    
+    #endregion
+    
+    #region Course
 
     public static class Course
     {
@@ -37,6 +47,10 @@ public class ApiEndPoints
         public const string DeleteCourse = $"{BaseUrl}/{{id::guid}}";
     }
     
+    #endregion
+    
+    #region Lesson
+    
     public static class Lesson
     {
         private const string BaseUrl = $"{ApiBaseUrl}/lesson";
@@ -47,6 +61,10 @@ public class ApiEndPoints
         public const string UpdateLesson = $"{BaseUrl}/{{id::guid}}";
         public const string DeleteLesson = $"{BaseUrl}/{{id::guid}}";
     }
+    
+    #endregion
+    
+    #region Package
     
     public static class Package
     {
@@ -59,6 +77,10 @@ public class ApiEndPoints
         public const string DeletePackage = $"{BaseUrl}/{{id::guid}}";
     }
     
+    #endregion
+    
+    #region Subscription
+    
     public static class Subscription
     {
         private const string BaseUrl = $"{ApiBaseUrl}/subscription";
@@ -66,6 +88,10 @@ public class ApiEndPoints
         public const string GetActiveSubscriptions = $"{BaseUrl}/active/{{userId::guid}}";
         public const string Subscribe = $"{BaseUrl}";
     }
+    
+    #endregion
+    
+    #region OpenAI
 
     public static class OpenAI
     {
@@ -73,4 +99,6 @@ public class ApiEndPoints
         
         public const string Ask = BaseUrl + "/ask";
     }
+    
+    #endregion
 }

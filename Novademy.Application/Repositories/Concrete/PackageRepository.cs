@@ -19,7 +19,9 @@ public class PackageRepository : IPackageRepository
         _cloudinaryService = cloudinaryService;
     }
     
-    public async Task<Package> CreatePackageAsync(Package package, IFormFile? image)
+    #region Create
+    
+    public async Task<Package> CreateAsync(Package package, IFormFile? image)
     {
         if (image is not null)
         {
@@ -36,14 +38,18 @@ public class PackageRepository : IPackageRepository
         return package;
     }
     
-    public async Task<IEnumerable<Package>> GetAllPackagesAsync()
+    #endregion
+    
+    #region Read
+    
+    public async Task<IEnumerable<Package>> GetAllAsync()
     {
         return await _context.Packages
             .Include(p => p.Courses)
             .ToListAsync();
     }
     
-    public async Task<Package?> GetPackageByIdAsync(Guid id)
+    public async Task<Package?> GetByIdAsync(Guid id)
     {
         var package = await _context.Packages
             .Include(p => p.Courses)
@@ -57,7 +63,11 @@ public class PackageRepository : IPackageRepository
         return package;
     }
     
-    public async Task<Package?> UpdatePackageAsync(Package package, IFormFile? image)
+    #endregion
+    
+    #region Update
+    
+    public async Task<Package?> UpdateAsync(Package package, IFormFile? image)
     {
         if (image is not null)
         {
@@ -78,7 +88,11 @@ public class PackageRepository : IPackageRepository
         return package;
     }
     
-    public async Task DeletePackageAsync(Guid id)
+    #endregion
+    
+    #region Delete
+    
+    public async Task DeleteAsync(Guid id)
     {
         var package = await _context.Packages
             .Include(p => p.Courses)
@@ -98,4 +112,6 @@ public class PackageRepository : IPackageRepository
         _context.Packages.Remove(package);
         await _context.SaveChangesAsync();
     }
+    
+    #endregion
 }

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Novademy.Contracts.Requests.Subscription;
 using Novademy.Contracts.Responses.Subscription;
 

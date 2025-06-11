@@ -4,8 +4,8 @@ namespace Novademy.Application.Repositories.Abstract;
 
 public interface IUserRepository
 {
-    Task<IEnumerable<User>> GetAllUsersAsync();
-    Task<User> GetUserByIdAsync(Guid userId);
-    Task<User> UpdateUserAsync(User user);
-    Task DeleteUserAsync(Guid userId);
+    Task<IEnumerable<User>> GetAllAsync();
+    Task<User> GetByIdAsync(Guid userId);
+    Task<User> UpdateAsync(User user);
+    Task DeleteAsync(Guid userId);
 }

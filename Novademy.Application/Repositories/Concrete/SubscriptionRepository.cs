@@ -13,15 +13,21 @@ public class SubscriptionRepository : ISubscriptionRepository
     {
         _context = context;
     }
+    
+    #region Create
 
-    public async Task<Subscription> CreateSubscriptionAsync(Subscription subscription)
+    public async Task<Subscription> CreateAsync(Subscription subscription)
     {
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync();
         return subscription;
     }
+    
+    #endregion
+    
+    #region Read
 
-    public async Task<IEnumerable<Subscription>> GetActiveSubscriptionsByUserIdAsync(Guid userId)
+    public async Task<IEnumerable<Subscription>> GetActiveByUserIdAsync(Guid userId)
     {
         var current = DateTime.UtcNow;
         var subscriptions = await _context.Subscriptions
@@ -37,15 +43,19 @@ public class SubscriptionRepository : ISubscriptionRepository
 
         return subscriptions;
     }
+    
+    #endregion
+    
+    #region Check
 
-    public async Task<bool> HasActiveSubscriptionForPackageAsync(Guid userId, Guid packageId)
+    public async Task<bool> HasActiveForPackageAsync(Guid userId, Guid packageId)
     {
         var current = DateTime.UtcNow;
         return await _context.Subscriptions
             .AnyAsync(s => s.UserId == userId && s.PackageId == packageId && s.StartDate <= current && s.EndDate >= current);
     }
 
-    public async Task<bool> HasActiveSubscriptionForCourseAsync(Guid userId, Guid courseId)
+    public async Task<bool> HasActiveForCourseAsync(Guid userId, Guid courseId)
     {
         var current = DateTime.UtcNow;
         return await _context.Subscriptions
@@ -55,7 +65,7 @@ public class SubscriptionRepository : ISubscriptionRepository
             .AnyAsync(s => s.Package.Courses.Any(c => c.Id == courseId));
     }
 
-    public async Task<bool> HasActiveSubscriptionForLessonAsync(Guid userId, Guid lessonId)
+    public async Task<bool> HasActiveForLessonAsync(Guid userId, Guid lessonId)
     {
         var current = DateTime.UtcNow;
         return await _context.Subscriptions
@@ -67,4 +77,6 @@ public class SubscriptionRepository : ISubscriptionRepository
                 .SelectMany(c => c.Lessons)
                 .Any(l => l.Id == lessonId));
     }
+    
+    #endregion
 }

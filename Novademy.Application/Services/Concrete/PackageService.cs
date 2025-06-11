@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentValidation;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Mapping;
@@ -30,19 +26,9 @@ public class PackageService : IPackageService
         _createValidator = createValidator;
         _updateValidator = updateValidator;
     }
-
-    public async Task<IEnumerable<PackageResponse>> GetAllAsync()
-    {
-        var packages = await _repo.GetAllPackagesAsync();
-        return packages.Select(p => p.MapToPackageResponse());
-    }
-
-    public async Task<PackageResponse> GetByIdAsync(Guid id)
-    {
-        var package = await _repo.GetPackageByIdAsync(id);
-        return package.MapToPackageResponse();
-    }
-
+    
+    #region Create
+    
     public async Task<PackageResponse> CreateAsync(CreatePackageRequest request)
     {
         await _createValidator.ValidateAndThrowAsync(request);
@@ -52,19 +38,39 @@ public class PackageService : IPackageService
         package.Courses = new List<Course>();
         foreach (var courseId in request.CourseIds)
         {
-            var course = await _courseRepo.GetCourseByIdAsync(courseId);
+            var course = await _courseRepo.GetByIdAsync(courseId);
             if (course is not null)
                 package.Courses.Add(course);
         }
         
-        var created = await _repo.CreatePackageAsync(package, request.Image);
+        var created = await _repo.CreateAsync(package, request.Image);
         return created.MapToPackageResponse();
     }
+    
+    #endregion
+    
+    #region Read
+
+    public async Task<IEnumerable<PackageResponse>> GetAllAsync()
+    {
+        var packages = await _repo.GetAllAsync();
+        return packages.Select(p => p.MapToPackageResponse());
+    }
+
+    public async Task<PackageResponse> GetByIdAsync(Guid id)
+    {
+        var package = await _repo.GetByIdAsync(id);
+        return package.MapToPackageResponse();
+    }
+    
+    #endregion
+    
+    #region Update
 
     public async Task<PackageResponse> UpdateAsync(Guid id, UpdatePackageRequest request)
     {
         await _updateValidator.ValidateAndThrowAsync(request);
-        var packageToUpdate = await _repo.GetPackageByIdAsync(id);
+        var packageToUpdate = await _repo.GetByIdAsync(id);
         packageToUpdate.Title = request.Title;
         packageToUpdate.Description = request.Description;
         packageToUpdate.Price = request.Price;
@@ -72,16 +78,22 @@ public class PackageService : IPackageService
         packageToUpdate.Courses.Clear();
         foreach (var courseId in request.CourseIds)
         {
-            var course = await _courseRepo.GetCourseByIdAsync(courseId);
+            var course = await _courseRepo.GetByIdAsync(courseId);
             if (course is not null)
                 packageToUpdate.Courses.Add(course);
         }
-        var updated = await _repo.UpdatePackageAsync(packageToUpdate, request.Image);
+        var updated = await _repo.UpdateAsync(packageToUpdate, request.Image);
         return updated.MapToPackageResponse();
     }
+    
+    #endregion
+    
+    #region Delete
 
     public async Task DeleteAsync(Guid id)
     {
-        await _repo.DeletePackageAsync(id);
+        await _repo.DeleteAsync(id);
     }
+    
+    #endregion
 } 

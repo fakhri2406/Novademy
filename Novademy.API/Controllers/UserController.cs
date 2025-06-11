@@ -17,6 +17,8 @@ public class UserController : ControllerBase
         _userService = userService;
     }
     
+    #region GET
+    
     /// <summary>
     /// Get all users
     /// </summary>
@@ -54,6 +56,10 @@ public class UserController : ControllerBase
         return Ok(response);
     }
     
+    #endregion
+    
+    #region PUT
+    
     /// <summary>
     /// Update an existing user
     /// </summary>
@@ -74,6 +80,10 @@ public class UserController : ControllerBase
         return Ok(response);
     }
     
+    #endregion
+    
+    #region DELETE
+    
     /// <summary>
     /// Delete a user by ID
     /// </summary>
@@ -93,4 +103,6 @@ public class UserController : ControllerBase
         await _userService.DeleteAsync(id);
         return NoContent();
     }
+    
+    #endregion
 }

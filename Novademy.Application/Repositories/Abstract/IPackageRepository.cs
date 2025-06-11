@@ -5,9 +5,9 @@ namespace Novademy.Application.Repositories.Abstract;
 
 public interface IPackageRepository
 {
-    Task<Package> CreatePackageAsync(Package package, IFormFile? image);
-    Task<IEnumerable<Package>> GetAllPackagesAsync();
-    Task<Package?> GetPackageByIdAsync(Guid id);
-    Task<Package?> UpdatePackageAsync(Package package, IFormFile? image);
-    Task DeletePackageAsync(Guid id);
+    Task<Package> CreateAsync(Package package, IFormFile? image);
+    Task<IEnumerable<Package>> GetAllAsync();
+    Task<Package?> GetByIdAsync(Guid id);
+    Task<Package?> UpdateAsync(Package package, IFormFile? image);
+    Task DeleteAsync(Guid id);
 }

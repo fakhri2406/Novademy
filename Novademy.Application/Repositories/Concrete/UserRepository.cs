@@ -17,13 +17,15 @@ public class UserRepository : IUserRepository
         _context = context;
         _cloudinaryService = cloudinaryService;
     }
+    
+    #region Read
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync()
+    public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _context.Users.Include(u => u.Role).ToListAsync();
     }
     
-    public async Task<User> GetUserByIdAsync(Guid userId)
+    public async Task<User> GetByIdAsync(Guid userId)
     {
         var user = await _context.Users
             .Include(u => u.Role)
@@ -37,14 +39,22 @@ public class UserRepository : IUserRepository
         return user;
     }
     
-    public async Task<User> UpdateUserAsync(User user)
+    #endregion
+    
+    #region Update
+    
+    public async Task<User> UpdateAsync(User user)
     {
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
         return user;
     }
     
-    public async Task DeleteUserAsync(Guid id)
+    #endregion
+    
+    #region Delete
+    
+    public async Task DeleteAsync(Guid id)
     {
         var user = await _context.Users.FindAsync(id);
         if (user == null)
@@ -61,4 +71,6 @@ public class UserRepository : IUserRepository
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
     }
+    
+    #endregion
 }

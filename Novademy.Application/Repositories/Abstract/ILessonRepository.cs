@@ -5,9 +5,9 @@ namespace Novademy.Application.Repositories.Abstract;
 
 public interface ILessonRepository
 {
-    Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image);
-    Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(Guid courseId);
-    Task<Lesson?> GetLessonByIdAsync(Guid id);
-    Task<Lesson?> UpdateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image);
-    Task DeleteLessonAsync(Guid id);
+    Task<Lesson> CreateAsync(Lesson lesson, IFormFile video, IFormFile? image);
+    Task<IEnumerable<Lesson>> GetByCourseIdAsync(Guid courseId);
+    Task<Lesson?> GetByIdAsync(Guid id);
+    Task<Lesson?> UpdateAsync(Lesson lesson, IFormFile video, IFormFile? image);
+    Task DeleteAsync(Guid id);
 }

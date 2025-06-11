@@ -19,7 +19,9 @@ public class CourseRepository : ICourseRepository
         _cloudinaryService = cloudinaryService;
     }
 
-    public async Task<Course> CreateCourseAsync(Course course, IFormFile? image)
+    #region Create
+
+    public async Task<Course> CreateAsync(Course course, IFormFile? image)
     {
         if (image is not null)
         {
@@ -36,12 +38,16 @@ public class CourseRepository : ICourseRepository
         return course;
     }
 
-    public async Task<IEnumerable<Course>> GetAllCoursesAsync()
+    #endregion
+
+    #region Read
+
+    public async Task<IEnumerable<Course>> GetAllAsync()
     {
         return await _context.Courses.ToListAsync();
     }
 
-    public async Task<Course?> GetCourseByIdAsync(Guid id)
+    public async Task<Course?> GetByIdAsync(Guid id)
     {
         var course = await _context.Courses.FindAsync(id);
         if (course == null)
@@ -51,7 +57,11 @@ public class CourseRepository : ICourseRepository
         return course;
     }
 
-    public async Task<Course?> UpdateCourseAsync(Course course, IFormFile? image)
+    #endregion
+
+    #region Update
+
+    public async Task<Course?> UpdateAsync(Course course, IFormFile? image)
     {
         if (image is not null)
         {
@@ -71,8 +81,12 @@ public class CourseRepository : ICourseRepository
 
         return course;
     }
+
+    #endregion
     
-    public async Task DeleteCourseAsync(Guid id)
+    #region Delete
+    
+    public async Task DeleteAsync(Guid id)
     {
         var course = await _context.Courses.FindAsync(id);
         if (course == null)
@@ -89,4 +103,6 @@ public class CourseRepository : ICourseRepository
         _context.Courses.Remove(course);
         await _context.SaveChangesAsync();
     }
+    
+    #endregion
 }

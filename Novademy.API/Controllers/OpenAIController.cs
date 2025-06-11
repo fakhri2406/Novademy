@@ -21,10 +21,11 @@ public class OpenAIController : ControllerBase
         _openAIService = openAIService;
     }
     
+    #region Ask Lesson Question
+
     /// <summary>
-    /// Ask a question using OpenAI API
+    /// Ask a question about a lesson using OpenAI API
     /// </summary>
-    /// <param name="lessonId"></param>
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
@@ -42,4 +43,6 @@ public class OpenAIController : ControllerBase
         var answer = await _openAIService.AskQuestionAsync(transcript!, request.Question);
         return Ok(new AskLessonQuestionResponse { Answer = answer });
     }
+    
+    #endregion
 }

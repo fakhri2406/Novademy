@@ -63,7 +63,7 @@ public class LessonController : ControllerBase
         if ((!isAdmin && !isTeacher) && !response.IsFree)
         {
             var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
-            var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForLessonAsync(userId, id);
+            var hasAccess = await _subscriptionRepo.HasActiveForLessonAsync(userId, id);
             if (!hasAccess)
             {
                 return Forbid("You do not have access to this lesson.");

@@ -25,5 +25,4 @@ public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
             .NotEmpty().WithMessage("Phone number is required.")
             .Matches(@"^0?\d{9}$").WithMessage("Phone number must be 9 or 10 digits, optionally starting with 0.");
     }
-
 }

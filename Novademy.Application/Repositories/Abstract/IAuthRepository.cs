@@ -5,8 +5,8 @@ namespace Novademy.Application.Repositories.Abstract;
 
 public interface IAuthRepository
 {
-    Task<User> RegisterUserAsync(User user, IFormFile? profilePicture);
-    Task<User> LoginUserAsync(string username, string password);
+    Task<User> RegisterAsync(User user, IFormFile? profilePicture);
+    Task<User> LoginAsync(string username, string password);
     Task CreateRefreshTokenAsync(RefreshToken refreshToken);
     Task<RefreshToken> GetRefreshTokenAsync(string token);
     Task RemoveRefreshTokenAsync(string token);

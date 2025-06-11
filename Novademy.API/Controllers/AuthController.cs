@@ -161,6 +161,8 @@ public class AuthController : ControllerBase
     
     #endregion
     
+    #region Test
+    
     /// <summary>
     /// Test endpoint to verify routing and authentication
     /// </summary>
@@ -172,4 +174,6 @@ public class AuthController : ControllerBase
         _logger.LogInformation("User claims: {@Claims}", User.Claims.Select(c => new { c.Type, c.Value }));
         return Ok(new { message = "Authentication successful", claims = User.Claims.Select(c => new { c.Type, c.Value }) });
     }
+    
+    #endregion
 }

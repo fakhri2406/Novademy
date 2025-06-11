@@ -42,12 +42,14 @@ public class AuthService : IAuthService
         _verifyEmailValidator = verifyEmailValidator;
     }
     
+    #region Register
+    
     public async Task<Guid> RegisterAsync(RegisterRequest request)
     {
         await _registerValidator.ValidateAndThrowAsync(request);
         
         var user = request.MapToUser();
-        var registeredUser = await _authRepo.RegisterUserAsync(user, request.ProfilePicture);
+        var registeredUser = await _authRepo.RegisterAsync(user, request.ProfilePicture);
         
         var templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplate.html");
         var htmlBody = await File.ReadAllTextAsync(templatePath);
@@ -63,11 +65,15 @@ public class AuthService : IAuthService
         return registeredUser.Id;
     }
     
+    #endregion
+    
+    #region Login
+    
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
         await _loginValidator.ValidateAndThrowAsync(request);
         
-        var user = await _authRepo.LoginUserAsync(request.Username, request.Password);
+        var user = await _authRepo.LoginAsync(request.Username, request.Password);
         
         if (!user.IsEmailVerified)
             throw new Exception("Email not verified.");
@@ -88,11 +94,15 @@ public class AuthService : IAuthService
         };
     }
     
+    #endregion
+    
+    #region Verify Email
+    
     public async Task VerifyEmailAsync(VerifyEmailRequest request)
     {
         await _verifyEmailValidator.ValidateAndThrowAsync(request);
         
-        var user = await _userRepo.GetUserByIdAsync(request.UserId);
+        var user = await _userRepo.GetByIdAsync(request.UserId);
 
         if (user.IsEmailVerified)
         {
@@ -112,8 +122,12 @@ public class AuthService : IAuthService
         user.IsEmailVerified = true;
         user.EmailVerificationCode = null;
         user.EmailVerificationExpiry = null;
-        await _userRepo.UpdateUserAsync(user);
+        await _userRepo.UpdateAsync(user);
     }
+    
+    #endregion
+    
+    #region Refresh
     
     public async Task<AuthResponse> RefreshAsync(RefreshTokenRequest request)
     {
@@ -142,8 +156,14 @@ public class AuthService : IAuthService
         };
     }
     
+    #endregion
+    
+    #region Logout
+    
     public async Task LogoutAsync(Guid userId)
     {
         await _authRepo.RemoveAllRefreshTokensAsync(userId);
     }
+    
+    #endregion
 } 

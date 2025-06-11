@@ -19,7 +19,9 @@ public class LessonRepository : ILessonRepository
         _cloudinaryService = cloudinaryService;
     }
     
-    public async Task<Lesson> CreateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
+    #region Create
+    
+    public async Task<Lesson> CreateAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
         var videoUploadResult = await _cloudinaryService.UploadVideoAsync(video, "lessons_videos");
         lesson.VideoUrl = videoUploadResult.SecureUrl.ToString();
@@ -39,7 +41,11 @@ public class LessonRepository : ILessonRepository
         return lesson;
     }
     
-    public async Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(Guid courseId)
+    #endregion
+    
+    #region Read
+    
+    public async Task<IEnumerable<Lesson>> GetByCourseIdAsync(Guid courseId)
     {
         var lessons = await _context.Lessons
             .Where(l => l.CourseId == courseId)
@@ -48,7 +54,7 @@ public class LessonRepository : ILessonRepository
         return lessons;
     }
     
-    public async Task<Lesson?> GetLessonByIdAsync(Guid id)
+    public async Task<Lesson?> GetByIdAsync(Guid id)
     {
         var lesson = await _context.Lessons.FindAsync(id);
         
@@ -60,7 +66,11 @@ public class LessonRepository : ILessonRepository
         return lesson;
     }
     
-    public async Task<Lesson?> UpdateLessonAsync(Lesson lesson, IFormFile video, IFormFile? image)
+    #endregion
+    
+    #region Update
+    
+    public async Task<Lesson?> UpdateAsync(Lesson lesson, IFormFile video, IFormFile? image)
     {
         var videoUrl = lesson.VideoUrl;
         if (!string.IsNullOrEmpty(videoUrl))
@@ -89,7 +99,11 @@ public class LessonRepository : ILessonRepository
         return lesson;
     }
     
-    public async Task DeleteLessonAsync(Guid id)
+    #endregion
+    
+    #region Delete
+    
+    public async Task DeleteAsync(Guid id)
     {
         var lesson = await _context.Lessons.FindAsync(id);
         if (lesson == null)
@@ -112,4 +126,6 @@ public class LessonRepository : ILessonRepository
         _context.Lessons.Remove(lesson);
         await _context.SaveChangesAsync();
     }
+    
+    #endregion
 }

@@ -61,7 +61,7 @@ public class CourseController : ControllerBase
         if (!isAdmin && !isTeacher)
         {
             var userId = Guid.Parse(User.FindFirst("id")?.Value ?? string.Empty);
-            var hasAccess = await _subscriptionRepo.HasActiveSubscriptionForCourseAsync(userId, id);
+            var hasAccess = await _subscriptionRepo.HasActiveForCourseAsync(userId, id);
             if (!hasAccess)
             {
                 return Forbid("You do not have access to this course.");

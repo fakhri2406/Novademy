@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentValidation;
 using Novademy.Application.Repositories.Abstract;
 using Novademy.Application.Mapping;
@@ -26,34 +22,44 @@ public class LessonService : ILessonService
         _createValidator = createValidator;
         _updateValidator = updateValidator;
     }
-
-    public async Task<IEnumerable<LessonResponse>> GetByCourseIdAsync(Guid courseId)
-    {
-        var lessons = await _repo.GetLessonsByCourseIdAsync(courseId);
-        return lessons.Select(l => l.MapToLessonResponse());
-    }
-
-    public async Task<LessonResponse> GetByIdAsync(Guid id)
-    {
-        var lesson = await _repo.GetLessonByIdAsync(id);
-        return lesson.MapToLessonResponse();
-    }
+    
+    #region Create
     
     public async Task<LessonResponse> CreateAsync(CreateLessonRequest request)
     {
         await _createValidator.ValidateAndThrowAsync(request);
         
         var lesson = request.MapToLesson();
-        var created = await _repo.CreateLessonAsync(lesson, request.Video, request.Image);
+        var created = await _repo.CreateAsync(lesson, request.Video, request.Image);
         
         return created.MapToLessonResponse();
     }
+    
+    #endregion
+    
+    #region Read
+
+    public async Task<IEnumerable<LessonResponse>> GetByCourseIdAsync(Guid courseId)
+    {
+        var lessons = await _repo.GetByCourseIdAsync(courseId);
+        return lessons.Select(l => l.MapToLessonResponse());
+    }
+
+    public async Task<LessonResponse> GetByIdAsync(Guid id)
+    {
+        var lesson = await _repo.GetByIdAsync(id);
+        return lesson.MapToLessonResponse();
+    }
+    
+    #endregion
+    
+    #region Update
 
     public async Task<LessonResponse> UpdateAsync(Guid id, UpdateLessonRequest request)
     {
         await _updateValidator.ValidateAndThrowAsync(request);
         
-        var lessonToUpdate = await _repo.GetLessonByIdAsync(id);
+        var lessonToUpdate = await _repo.GetByIdAsync(id);
         
         lessonToUpdate.Title = request.Title;
         lessonToUpdate.Description = request.Description;
@@ -61,12 +67,18 @@ public class LessonService : ILessonService
         lessonToUpdate.Transcript = request.Transcript;
         lessonToUpdate.UpdatedAt = DateTime.UtcNow;
         
-        var updated = await _repo.UpdateLessonAsync(lessonToUpdate, request.Video, request.Image);
+        var updated = await _repo.UpdateAsync(lessonToUpdate, request.Video, request.Image);
         return updated.MapToLessonResponse();
     }
+    
+    #endregion
+    
+    #region Delete
 
     public async Task DeleteAsync(Guid id)
     {
-        await _repo.DeleteLessonAsync(id);
+        await _repo.DeleteAsync(id);
     }
+    
+    #endregion
 } 
