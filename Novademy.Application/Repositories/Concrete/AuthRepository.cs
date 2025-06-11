@@ -150,33 +150,4 @@ public class AuthRepository : IAuthRepository
     }
     
     #endregion
-    
-    #region Get
-    
-    public async Task<User> GetUserByIdAsync(Guid userId)
-    {
-        var user = await _context.Users
-            .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.Id == userId);
-        
-        if (user is null)
-        {
-            throw new KeyNotFoundException("User not found.");
-        }
-        
-        return user;
-    }
-    
-    #endregion
-    
-    #region Update
-    
-    public async Task<User> UpdateUserAsync(User user)
-    {
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
-        return user;
-    }
-    
-    #endregion
 }

@@ -4,20 +4,18 @@ using Novademy.Contracts.Requests.Course;
 using Novademy.Contracts.Requests.Lesson;
 using Novademy.Contracts.Requests.Package;
 using Novademy.Contracts.Requests.Subscription;
-using Novademy.Contracts.Responses.Auth;
 using Novademy.Contracts.Responses.Course;
 using Novademy.Contracts.Responses.Lesson;
 using Novademy.Contracts.Responses.Package;
 using Novademy.Contracts.Responses.Subscription;
-using System;
-using System.IO;
-using System.Linq;
+using Novademy.Contracts.Responses.User;
 
 namespace Novademy.Application.Mapping;
 
 public static class ContractMapping
 {
     #region User
+    
     public static User MapToUser(this RegisterRequest request)
     {
         return new User
@@ -35,9 +33,27 @@ public static class ContractMapping
             Sector = request.Sector
         };
     }
+    
+    public static UserResponse MapToUserResponse(this User user)
+    {
+        return new UserResponse
+        {
+            Id = user.Id,
+            Username = user.Username,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            Role = user.Role!.Name,
+            Group = user.Group,
+            Sector = user.Sector
+        };
+    }
+    
     #endregion
 
     #region Course
+    
     public static Course MapToCourse(this CreateCourseRequest request)
     {
         return new Course
@@ -50,7 +66,7 @@ public static class ContractMapping
             UpdatedAt = DateTime.UtcNow
         };
     }
-
+    
     public static CourseResponse MapToCourseResponse(this Course course)
     {
         return new CourseResponse
@@ -64,9 +80,11 @@ public static class ContractMapping
             UpdatedAt = course.UpdatedAt
         };
     }
+    
     #endregion
 
     #region Lesson
+    
     public static Lesson MapToLesson(this CreateLessonRequest request)
     {
         return new Lesson
@@ -82,7 +100,7 @@ public static class ContractMapping
             UpdatedAt = DateTime.UtcNow
         };
     }
-
+    
     public static LessonResponse MapToLessonResponse(this Lesson lesson)
     {
         return new LessonResponse
@@ -100,9 +118,11 @@ public static class ContractMapping
             CourseId = lesson.CourseId
         };
     }
+    
     #endregion
 
     #region Package
+    
     public static Package MapToPackage(this CreatePackageRequest request)
     {
         return new Package
@@ -115,7 +135,7 @@ public static class ContractMapping
             UpdatedAt = DateTime.UtcNow
         };
     }
-
+    
     public static PackageResponse MapToPackageResponse(this Package package)
     {
         return new PackageResponse
@@ -130,9 +150,11 @@ public static class ContractMapping
             CourseIds = package.Courses.Select(c => c.Id).ToList()
         };
     }
+    
     #endregion
 
     #region Subscription
+    
     public static Subscription MapToSubscription(this SubscriptionRequest request)
     {
         return new Subscription
@@ -144,7 +166,7 @@ public static class ContractMapping
             EndDate = DateTime.UtcNow.AddYears(1)
         };
     }
-
+    
     public static SubscriptionResponse MapToSubscriptionResponse(this Subscription subscription)
     {
         return new SubscriptionResponse
@@ -157,5 +179,6 @@ public static class ContractMapping
             IsActive = subscription.IsActive
         };
     }
+    
     #endregion
-} 
+}

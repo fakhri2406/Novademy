@@ -10,11 +10,13 @@ namespace Novademy.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IUserService _userService;
     private readonly ILogger<AuthController> _logger;
     
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+    public AuthController(IAuthService authService, IUserService userService, ILogger<AuthController> logger)
     {
         _authService = authService;
+        _userService = userService;
         _logger = logger;
     }
     
@@ -153,9 +155,11 @@ public class AuthController : ControllerBase
         var userId = Guid.Parse(userIdClaim.Value);
         _logger.LogInformation("User ID from token: {UserId}", userId);
             
-        var user = await _authService.GetUserByIdAsync(userId);
+        var user = await _userService.GetByIdAsync(userId);
         return Ok(user);
     }
+    
+    #endregion
     
     /// <summary>
     /// Test endpoint to verify routing and authentication
@@ -168,6 +172,4 @@ public class AuthController : ControllerBase
         _logger.LogInformation("User claims: {@Claims}", User.Claims.Select(c => new { c.Type, c.Value }));
         return Ok(new { message = "Authentication successful", claims = User.Claims.Select(c => new { c.Type, c.Value }) });
     }
-    
-    #endregion
 }

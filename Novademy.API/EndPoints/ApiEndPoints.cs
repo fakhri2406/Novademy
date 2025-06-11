@@ -16,6 +16,16 @@ public class ApiEndPoints
         public const string GetCurrentUser = $"{BaseUrl}/me";
     }
     
+    public static class User
+    {
+        private const string BaseUrl = $"{ApiBaseUrl}/user";
+        
+        public const string GetUsers = BaseUrl;
+        public const string GetUser = $"{BaseUrl}/{{id::guid}}";
+        public const string UpdateUser = $"{BaseUrl}/{{id::guid}}";
+        public const string DeleteUser = $"{BaseUrl}/{{id::guid}}";
+    }
+
     public static class Course
     {
         private const string BaseUrl = $"{ApiBaseUrl}/course";

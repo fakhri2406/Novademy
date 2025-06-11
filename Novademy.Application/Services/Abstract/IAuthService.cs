@@ -13,5 +13,4 @@ public interface IAuthService
     Task VerifyEmailAsync(VerifyEmailRequest request);
     Task<AuthResponse> RefreshAsync(RefreshTokenRequest request);
     Task LogoutAsync(Guid userId);
-    Task<User> GetUserByIdAsync(Guid userId);
 } 

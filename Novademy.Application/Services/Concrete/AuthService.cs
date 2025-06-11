@@ -13,7 +13,8 @@ namespace Novademy.Application.Services.Concrete;
 
 public class AuthService : IAuthService
 {
-    private readonly IAuthRepository _repo;
+    private readonly IAuthRepository _authRepo;
+    private readonly IUserRepository _userRepo;
     private readonly ITokenGenerator _tokenGenerator;
     private readonly IEmailService _emailService;
     private readonly IWebHostEnvironment _environment;
@@ -22,7 +23,8 @@ public class AuthService : IAuthService
     private readonly IValidator<VerifyEmailRequest> _verifyEmailValidator;
     
     public AuthService(
-        IAuthRepository repo,
+        IAuthRepository authRepo,
+        IUserRepository userRepo,
         ITokenGenerator tokenGenerator,
         IEmailService emailService,
         IWebHostEnvironment environment,
@@ -30,7 +32,8 @@ public class AuthService : IAuthService
         IValidator<LoginRequest> loginValidator,
         IValidator<VerifyEmailRequest> verifyEmailValidator)
     {
-        _repo = repo;
+        _authRepo = authRepo;
+        _userRepo = userRepo;
         _tokenGenerator = tokenGenerator;
         _emailService = emailService;
         _environment = environment;
@@ -44,7 +47,7 @@ public class AuthService : IAuthService
         await _registerValidator.ValidateAndThrowAsync(request);
         
         var user = request.MapToUser();
-        var registeredUser = await _repo.RegisterUserAsync(user, request.ProfilePicture);
+        var registeredUser = await _authRepo.RegisterUserAsync(user, request.ProfilePicture);
         
         var templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplate.html");
         var htmlBody = await File.ReadAllTextAsync(templatePath);
@@ -64,7 +67,7 @@ public class AuthService : IAuthService
     {
         await _loginValidator.ValidateAndThrowAsync(request);
         
-        var user = await _repo.LoginUserAsync(request.Username, request.Password);
+        var user = await _authRepo.LoginUserAsync(request.Username, request.Password);
         
         if (!user.IsEmailVerified)
             throw new Exception("Email not verified.");
@@ -76,7 +79,7 @@ public class AuthService : IAuthService
             ExpiresAt = DateTime.UtcNow.AddDays(30),
             UserId = user.Id
         };
-        await _repo.CreateRefreshTokenAsync(refreshToken);
+        await _authRepo.CreateRefreshTokenAsync(refreshToken);
         
         return new AuthResponse
         {
@@ -89,7 +92,7 @@ public class AuthService : IAuthService
     {
         await _verifyEmailValidator.ValidateAndThrowAsync(request);
         
-        var user = await _repo.GetUserByIdAsync(request.UserId);
+        var user = await _userRepo.GetUserByIdAsync(request.UserId);
 
         if (user.IsEmailVerified)
         {
@@ -109,15 +112,15 @@ public class AuthService : IAuthService
         user.IsEmailVerified = true;
         user.EmailVerificationCode = null;
         user.EmailVerificationExpiry = null;
-        await _repo.UpdateUserAsync(user);
+        await _userRepo.UpdateUserAsync(user);
     }
     
     public async Task<AuthResponse> RefreshAsync(RefreshTokenRequest request)
     {
-        var currentRefreshToken = await _repo.GetRefreshTokenAsync(request.Token);
+        var currentRefreshToken = await _authRepo.GetRefreshTokenAsync(request.Token);
         if (currentRefreshToken.ExpiresAt < DateTime.UtcNow)
         {
-            await _repo.RemoveRefreshTokenAsync(currentRefreshToken.Token);
+            await _authRepo.RemoveRefreshTokenAsync(currentRefreshToken.Token);
             throw new UnauthorizedAccessException("Expired refresh token. Please log in again.");
         }
         
@@ -129,8 +132,8 @@ public class AuthService : IAuthService
             UserId = currentRefreshToken.UserId
         };
         
-        await _repo.CreateRefreshTokenAsync(newRefreshToken);
-        await _repo.RemoveRefreshTokenAsync(currentRefreshToken.Token);
+        await _authRepo.CreateRefreshTokenAsync(newRefreshToken);
+        await _authRepo.RemoveRefreshTokenAsync(currentRefreshToken.Token);
         
         return new AuthResponse
         {
@@ -141,16 +144,6 @@ public class AuthService : IAuthService
     
     public async Task LogoutAsync(Guid userId)
     {
-        await _repo.RemoveAllRefreshTokensAsync(userId);
-    }
-
-    public async Task<User> GetUserByIdAsync(Guid userId)
-    {
-        var user = await _repo.GetUserByIdAsync(userId);
-        if (user == null)
-        {
-            throw new KeyNotFoundException($"User with ID {userId} not found.");
-        }
-        return user;
+        await _authRepo.RemoveAllRefreshTokensAsync(userId);
     }
 } 

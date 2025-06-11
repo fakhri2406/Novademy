@@ -25,6 +25,7 @@ public static class DependencyInjection
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<IPackageRepository, PackageRepository>();
@@ -36,6 +37,7 @@ public static class DependencyInjection
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<ILessonService, LessonService>();
         services.AddScoped<IPackageService, PackageService>();
