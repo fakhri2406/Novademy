@@ -117,7 +117,8 @@ public class UserControllerTests
             Email = "newemail@example.com",
             PhoneNumber = "0987654321",
             Group = 3,
-            Sector = SectorType.Russian
+            Sector = SectorType.Russian,
+            ProfilePicture = null
         };
         var updatedUser = new UserResponse
         {
@@ -129,7 +130,8 @@ public class UserControllerTests
             PhoneNumber = updateRequest.PhoneNumber,
             Role = "User",
             Group = updateRequest.Group,
-            Sector = updateRequest.Sector
+            Sector = updateRequest.Sector,
+            ProfilePictureUrl = null
         };
         var mockUserService = new Mock<IUserService>();
         mockUserService.Setup(s => s.UpdateAsync(userId, updateRequest)).ReturnsAsync(updatedUser);
