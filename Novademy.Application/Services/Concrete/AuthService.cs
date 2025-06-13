@@ -122,7 +122,7 @@ public class AuthService : IAuthService
         user.IsEmailVerified = true;
         user.EmailVerificationCode = null;
         user.EmailVerificationExpiry = null;
-        await _userRepo.UpdateAsync(user);
+        await _userRepo.UpdateAsync(user, null);
     }
     
     #endregion

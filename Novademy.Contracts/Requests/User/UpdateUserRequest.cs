@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Novademy.Contracts.Enums;
 
 namespace Novademy.Contracts.Requests.User;
@@ -11,4 +12,5 @@ public class UpdateUserRequest
     public required string PhoneNumber { get; init; }
     public int Group { get; init; }
     public SectorType Sector { get; init; }
+    public IFormFile? ProfilePicture { get; init; }
 }

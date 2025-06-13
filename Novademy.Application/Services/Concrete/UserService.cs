@@ -50,7 +50,7 @@ public class UserService : IUserService
         user.Group = request.Group;
         user.Sector = request.Sector;
         
-        var updatedUser = await _userRepository.UpdateAsync(user);
+        var updatedUser = await _userRepository.UpdateAsync(user, request.ProfilePicture);
         return updatedUser.MapToUserResponse();
     }
     

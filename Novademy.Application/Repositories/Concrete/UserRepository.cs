@@ -1,4 +1,5 @@
 using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Novademy.Application.Data.EFCore;
 using Novademy.Application.ExternalServices.Cloudinary;
@@ -38,15 +39,27 @@ public class UserRepository : IUserRepository
         
         return user;
     }
-    
+
     #endregion
     
     #region Update
     
-    public async Task<User> UpdateAsync(User user)
+    public async Task<User> UpdateAsync(User user, IFormFile? profilePicture)
     {
+        if (profilePicture is not null)
+        {
+            var imageUrl = user.ProfilePictureUrl;
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                await _cloudinaryService.DeleteFileAsync(imageUrl, ResourceType.Image);
+            }
+            var uploadResult = await _cloudinaryService.UploadImageAsync(profilePicture, "users");
+            user.ProfilePictureUrl = uploadResult.SecureUrl.ToString();
+        }
+        
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
+        
         return user;
     }
     

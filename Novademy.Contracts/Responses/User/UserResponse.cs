@@ -13,4 +13,5 @@ public class UserResponse
     public string Role { get; init; }
     public int Group { get; init; }
     public SectorType Sector { get; init; }
+    public string? ProfilePictureUrl { get; init; }
 }

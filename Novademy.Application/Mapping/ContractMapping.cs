@@ -46,7 +46,8 @@ public static class ContractMapping
             PhoneNumber = user.PhoneNumber,
             Role = user.Role!.Name,
             Group = user.Group,
-            Sector = user.Sector
+            Sector = user.Sector,
+            ProfilePictureUrl = user.ProfilePictureUrl
         };
     }
     
